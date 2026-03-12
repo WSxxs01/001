@@ -68,8 +68,6 @@ const buttonConfig = computed(() => {
 
 // 点击操作
 function handleClick() {
-  console.log('[SectionItem] handleClick 被触发，sectionKey:', props.sectionKey)
-
   if (buttonConfig.value.action === 'done') return
 
   // 调用 store 方法
@@ -84,7 +82,6 @@ function handleClick() {
 
 // 移动端触摸处理
 function handleTouchEnd(e) {
-  console.log('[SectionItem] handleTouchEnd 被触发')
   // 防止触摸触发两次点击事件
   e.preventDefault()
   e.stopPropagation()

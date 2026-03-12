@@ -296,10 +296,6 @@ export const useStudyStore = defineStore('study', () => {
 
   // 提交复习反馈
   function submitReview(sectionKey, feedback) {
-    // 移动端调试：强制弹窗反馈
-    console.log('[移动端调试] submitReview 被调用，sectionKey:', sectionKey, 'feedback:', feedback)
-    alert('已成功接收到点击信号！sectionKey: ' + sectionKey)
-
     try {
       // 第一重保护：打印日志
       console.log('正在打卡的小节：', sectionKey, feedback)
@@ -401,7 +397,6 @@ export const useStudyStore = defineStore('study', () => {
     } catch (error) {
       console.error('打卡逻辑崩溃：', error)
       const errMsg = '打卡失败: ' + error.message
-      console.log('[移动端调试] 错误详情:', error)
       // 移动端友好提示
       if (typeof window !== 'undefined' && window.alert) {
         alert(errMsg)
