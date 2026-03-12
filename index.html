@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" content="#667eea" />
+    <title>艾宾浩斯复习打卡系统</title>
+
+    <!-- vConsole 移动端调试工具 -->
+    <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+    <script>
+      // 初始化 vConsole
+      var vConsole = new window.VConsole({
+        defaultPlugins: ['system', 'network', 'element', 'storage'],
+        maxLogNumber: 100
+      });
+      console.log('[vConsole] 移动端调试控制台已启动');
+    </script>
+
+    <!-- 全局 CSS 修复：禁止事件吞噬 -->
+    <style>
+      /* 禁止按钮内部元素吞噬点击事件 */
+      button * {
+        pointer-events: none !important;
+      }
+
+      /* 解决 iOS 下 hover 导致需要双击的问题 */
+      @media (hover: hover) {
+        button:hover {
+          /* 保持原有 hover 逻辑，但在纯触摸屏上禁用它 */
+        }
+      }
+
+      /* 核心修复：所有按钮的移动端优化 */
+      button {
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      /* 触摸设备上禁用 hover 效果，避免延迟 */
+      @media (pointer: coarse) {
+        button:hover {
+          /* 纯触摸设备上不执行 hover */
+        }
+        button:active {
+          opacity: 0.8;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
