@@ -118,97 +118,71 @@ function restoreCard(savedCard) {
 }
 
 /**
- * 调度下一次复习
- * @param {Object} currentData - 当前小节的学习数据（包含 fsrsCard）
+ * 调度下一次复习 - 简单可靠的间隔重复算法
+ * 基于 SM-2 风格的简化实现
+ * @param {Object} currentData - 当前小节的学习数据
  * @param {string} feedback - 用户反馈: 'easy', 'normal', 'hard'
  * @returns {Object} 更新后的数据
  */
 export function scheduleNextReview(currentData, feedback) {
   try {
-    // 每次都创建新卡片，避免恢复时的复杂问题
-    const card = createEmptyCard()
+    // 当前间隔和难度
+    let interval = currentData?.interval || 1
+    let difficulty = currentData?.difficulty || 1
 
-    // 获取对应的 FSRS 评级
-    const ratingMap = {
-      'easy': Rating.Easy,      // 太简单
-      'normal': Rating.Good,   // 掌握一般
-      'hard': Rating.Hard      // 太难了
-    }
-
-    const rating = ratingMap[feedback] || Rating.Good
-
-    // 使用 FSRS 计算下次复习
-    const scheduling = fsrs.repeat(card, rating)
-
-    // 检查 scheduling 是否有效
-    if (!scheduling) {
-      console.error('FSRS repeat returned invalid scheduling')
-      return getDefaultReviewResult()
-    }
-
-    // 根据评级获取对应的结果
-    let result
-    switch (rating) {
-      case Rating.Easy:
-        result = scheduling.easy
+    // 根据反馈调整间隔
+    let newInterval
+    switch (feedback) {
+      case 'easy':
+        // 太简单：间隔翻倍
+        newInterval = Math.round(interval * 2.5)
+        difficulty = Math.max(0.5, difficulty - 0.5)
         break
-      case Rating.Good:
-        result = scheduling.good
+      case 'hard':
+        // 太难：间隔减半或重置
+        newInterval = Math.max(1, Math.round(interval * 0.5))
+        difficulty = Math.min(5, difficulty + 1)
         break
-      case Rating.Hard:
-        result = scheduling.hard
-        break
+      case 'normal':
       default:
-        result = scheduling.good
+        // 正常：间隔增加到 1.5-2 倍
+        newInterval = Math.round(interval * (difficulty < 2 ? 2 : 1.5))
+        break
     }
 
-    // 如果 result 仍然不存在，尝试其他可用评级
-    if (!result) {
-      console.warn('未找到对应的评级结果，尝试其他评级')
-      const availableRatings = ['again', 'hard', 'good', 'easy']
-      for (const r of availableRatings) {
-        if (scheduling[r]) {
-          result = scheduling[r]
-          break
-        }
-      }
-    }
+    // 最大间隔 180 天
+    newInterval = Math.min(180, newInterval)
 
-    // 最终检查，如果还是没有结果，返回默认值
-    if (!result || !result.card) {
-      console.warn('No valid scheduling result, using defaults')
-      return getDefaultReviewResult()
-    }
+    // 计算下次复习日期
+    const today = new Date()
+    const dueDate = new Date(today)
+    dueDate.setDate(dueDate.getDate() + newInterval)
 
-    // 提取关键数据
-    const dueDate = result.card.due
+    // 新的重复次数
+    const repetitions = (currentData?.repetitions || 0) + 1
+
+    console.log('[间隔算法] interval:', interval, '->', newInterval, 'difficulty:', difficulty)
 
     return {
-      // FSRS Card 数据（用于持久化）
-      fsrsCard: result.card,
+      // 简单存储，不依赖复杂的 card 对象
+      fsrsCard: { state: 0, interval: newInterval },
 
       // 下次复习时间
       due: formatDate(dueDate),
 
-      // 难度 (0-10)
-      difficulty: result.card.difficulty,
+      // 难度 (0-5)
+      difficulty: difficulty,
 
-      // 稳定性（记忆稳固程度）
-      stability: result.card.stability,
+      // 稳定性（简化为间隔）
+      stability: newInterval,
 
       // 复习间隔（天）
-      interval: result.card.interval || 0,
+      interval: newInterval,
 
       // 学习次数
-      repetitions: result.card.reps || 1,
+      repetitions: repetitions,
 
-      // 是否是新卡片
-      isNew: result.card.state === 0,  // State.New
-
-      // 是否 lapsed（遗忘后重新学习）
-      isLapsed: result.card.lapses > 0,
-
-      // 截止日期（用于排序）
+      // 截止日期时间戳
       dueTimestamp: dueDate.getTime()
     }
   } catch (e) {

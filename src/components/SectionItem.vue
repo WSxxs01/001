@@ -145,8 +145,9 @@ function handleDelete(e) {
   justify-content: space-between;
   align-items: center;
   padding: 12px 15px 12px 25px;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s, opacity 0.3s;
+  border-bottom: 1px solid var(--card-border);
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .section-item:last-child {
@@ -154,7 +155,7 @@ function handleDelete(e) {
 }
 
 .section-item:hover {
-  background: #f9f9f9;
+  background: var(--glass-bg-hover);
 }
 
 .section-item.completed-flash {
@@ -162,14 +163,14 @@ function handleDelete(e) {
 }
 
 @keyframes completeFlash {
-  0% { background: #c8e6c9; }
-  50% { background: #a5d6a7; }
+  0% { background: rgba(52, 211, 153, 0.3); }
+  50% { background: rgba(52, 211, 153, 0.2); }
   100% { background: transparent; }
 }
 
 .section-name {
   font-size: 13px;
-  color: #333;
+  color: var(--text-primary);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -188,10 +189,10 @@ function handleDelete(e) {
   flex-shrink: 0;
 }
 
-.mastery-learning { background: #1976d2; }
-.mastery-stable { background: #4caf50; }
-.mastery-mastered { background: #2e7d32; box-shadow: 0 0 4px rgba(46, 125, 50, 0.5); }
-.mastery-weak { background: #f44336; }
+.mastery-learning { background: var(--info); }
+.mastery-stable { background: var(--success); }
+.mastery-mastered { background: var(--success-light); box-shadow: 0 0 8px rgba(52, 211, 153, 0.5); }
+.mastery-weak { background: var(--danger); }
 
 .section-right {
   display: flex;
@@ -201,32 +202,32 @@ function handleDelete(e) {
 
 .section-status-tag {
   padding: 3px 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 500;
 }
 
-.tag-unstarted { background: #f5f5f5; color: #999; }
-.tag-learning { background: #e3f2fd; color: #1976d2; }
-.tag-today { background: #fff3e0; color: #f57c00; animation: glow 1.5s infinite; }
-.tag-overdue { background: #ffebee; color: #d32f2f; }
-.tag-stable { background: #c8e6c9; color: #2e7d32; }
-.tag-mastered { background: #a5d6a7; color: #1b5e20; }
-.tag-weak { background: #ffcdd2; color: #c62828; }
+.tag-unstarted { background: var(--glass-bg); color: var(--text-muted); }
+.tag-learning { background: rgba(56, 189, 248, 0.2); color: var(--info); }
+.tag-today { background: rgba(251, 191, 36, 0.2); color: var(--warning); animation: glow 1.5s infinite; }
+.tag-overdue { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+.tag-stable { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+.tag-mastered { background: rgba(52, 211, 153, 0.3); color: var(--success-light); }
+.tag-weak { background: rgba(248, 113, 113, 0.3); color: var(--danger-light); }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 3px rgba(255, 152, 0, 0.3); }
-  50% { box-shadow: 0 0 8px rgba(255, 152, 0, 0.6); }
+  0%, 100% { box-shadow: 0 0 3px rgba(251, 191, 36, 0.3); }
+  50% { box-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
 }
 
 .section-btn {
   padding: 6px 14px;
   border: none;
-  border-radius: 15px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 12px;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   white-space: nowrap;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -242,24 +243,26 @@ function handleDelete(e) {
 }
 
 .section-btn.btn-learn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--gradient-primary);
   color: white;
+  box-shadow: 0 4px 15px rgba(129, 140, 248, 0.3);
 }
 
 .section-btn.btn-review {
-  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  background: linear-gradient(135deg, #f87171, #f59e0b);
   color: white;
+  box-shadow: 0 4px 15px rgba(248, 113, 113, 0.3);
 }
 
 .section-btn.btn-done {
-  background: #e0e0e0;
-  color: #999;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
 .section-btn:hover:not(.btn-done) {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .section-delete-btn {
@@ -268,19 +271,21 @@ function handleDelete(e) {
   cursor: pointer;
   font-size: 14px;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   opacity: 0;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   margin-right: 8px;
   flex-shrink: 0;
 }
 
 .section-item:hover .section-delete-btn {
-  opacity: 1;
+  opacity: 0.6;
 }
 
 .section-delete-btn:hover {
-  background: #ffebee;
+  background: rgba(248, 113, 113, 0.2);
+  color: var(--danger);
+  opacity: 1;
   transform: scale(1.1);
 }
 </style>

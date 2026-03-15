@@ -191,40 +191,38 @@ function openAddBookModal() {
   box-sizing: border-box;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  padding: 20px;
-}
-
 .app {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
 }
 
 h1 {
   text-align: center;
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 25px;
-  font-size: 26px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .settings-btn {
-  background: rgba(255,255,255,0.2);
-  border: none;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   font-size: 20px;
   cursor: pointer;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin-left: 15px;
   vertical-align: middle;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  backdrop-filter: var(--glass-blur);
 }
 
 .settings-btn:hover {
-  background: rgba(255,255,255,0.3);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
   transform: rotate(30deg);
 }
 
@@ -237,107 +235,121 @@ h1 {
 }
 
 .stat-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
   padding: 20px 15px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  transition: transform 0.3s;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 .stat-card .number {
   font-size: 36px;
   font-weight: bold;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .stat-card.success .number {
-  background: linear-gradient(135deg, #11998e, #38ef7d);
+  background: var(--gradient-success);
   -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .stat-card.warning .number {
-  background: linear-gradient(135deg, #f093fb, #f5576c);
+  background: var(--gradient-warning);
   -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .stat-card.danger .number {
-  background: linear-gradient(135deg, #ff9a9e, #fecfef);
+  background: var(--gradient-danger);
   -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .stat-card .label {
-  color: #666;
+  color: var(--text-secondary);
   margin-top: 5px;
   font-size: 13px;
 }
 
 /* 进度条 */
 .progress-section {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: var(--glass-shadow);
 }
 
 .progress-bar {
-  height: 20px;
-  background: #e0e0e0;
-  border-radius: 10px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  transition: width 0.5s;
-  border-radius: 10px;
+  background: var(--gradient-primary);
+  transition: width 0.5s ease;
+  border-radius: 6px;
+  box-shadow: 0 0 20px rgba(129, 140, 248, 0.5);
 }
 
 .progress-text {
   text-align: center;
   margin-top: 10px;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 /* 今日提醒 */
 .today-alert {
-  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-  border-left: 5px solid #ff9800;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1));
+  border-left: 4px solid var(--warning);
   padding: 15px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   margin-bottom: 20px;
+  backdrop-filter: var(--glass-blur);
 }
 
 .today-alert h3 {
-  color: #e65100;
+  color: var(--warning-light);
   font-size: 16px;
 }
 
 /* 面板 */
 .panel {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: var(--glass-shadow);
 }
 
 .panel h2 {
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 3px solid;
-  border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
+  border-bottom: 1px solid var(--card-border);
   font-size: 18px;
+  font-weight: 500;
 }
 
 .tab-actions {
@@ -350,30 +362,31 @@ h1 {
 
 .add-btn {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #11998e, #38ef7d);
+  background: var(--gradient-success);
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
   color: white;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(52, 211, 153, 0.3);
 }
 
 .add-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 20px rgba(52, 211, 153, 0.4);
 }
 
 /* 响应式 */
 @media (max-width: 768px) {
-  body {
+  .app {
     padding: 10px;
   }
 
   h1 {
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 15px;
   }
 
@@ -412,14 +425,16 @@ h1 {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
   padding: 12px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   gap: 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: var(--glass-shadow);
   z-index: 1000;
   animation: slideUp 0.3s ease;
 }
@@ -440,15 +455,15 @@ h1 {
 }
 
 .pwa-install-btn {
-  background: white;
-  color: #667eea;
+  background: var(--gradient-primary);
+  color: white;
   border: none;
   padding: 6px 16px;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
 }
 
 .pwa-install-btn:hover {
@@ -457,8 +472,8 @@ h1 {
 
 .pwa-dismiss-btn {
   background: transparent;
-  color: white;
-  border: 1px solid rgba(255,255,255,0.5);
+  color: var(--text-secondary);
+  border: 1px solid var(--glass-border);
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -467,10 +482,12 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .pwa-dismiss-btn:hover {
-  background: rgba(255,255,255,0.2);
+  background: var(--glass-bg-hover);
+  color: var(--text-primary);
 }
 
 /* 撤销 Snackbar */
@@ -479,14 +496,16 @@ h1 {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #333;
-  color: white;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
   padding: 12px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   gap: 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: var(--glass-shadow);
   z-index: 1001;
 }
 
@@ -495,31 +514,23 @@ h1 {
 }
 
 .undo-btn {
-  background: #ff9800;
-  color: white;
+  background: var(--gradient-warning);
+  color: #1a1a1a;
   border: none;
   padding: 6px 16px;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
 .undo-btn:hover {
-  background: #f57c00;
-}
-
-.undo-dismiss {
-  background: transparent;
-  color: #999;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 0 4px;
+  transform: scale(1.05);
 }
 
 .undo-dismiss:hover {
-  color: white;
+  color: var(--text-primary);
 }
 
 /* Transition */

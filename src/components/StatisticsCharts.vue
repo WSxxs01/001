@@ -284,16 +284,19 @@ onMounted(async () => {
 }
 
 .chart-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
   padding: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: var(--glass-shadow);
 }
 
 .chart-card h3 {
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 15px;
   font-size: 16px;
+  font-weight: 500;
 }
 
 .chart-container {
@@ -303,11 +306,11 @@ onMounted(async () => {
 
 .chart-desc {
   font-size: 12px;
-  color: #999;
+  color: var(--text-muted);
   text-align: center;
   padding: 10px;
-  background: #f5f5f5;
-  border-radius: 8px;
+  background: var(--glass-bg);
+  border-radius: var(--radius-sm);
 }
 
 .schedule-table {
@@ -324,17 +327,17 @@ onMounted(async () => {
 .schedule-table td {
   padding: 8px;
   text-align: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--card-border);
 }
 
 .schedule-table th {
-  background: #f5f5f5;
-  color: #333;
+  background: var(--glass-bg);
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
 .schedule-table tr:hover {
-  background: #fafafa;
+  background: var(--glass-bg-hover);
 }
 
 @media (max-width: 768px) {

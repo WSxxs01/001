@@ -70,26 +70,30 @@ function handleDelete(bookId, event) {
 
 .book-tab {
   padding: 10px 20px;
-  background: #f5f5f5;
-  border: none;
-  border-radius: 20px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  transition: all 0.3s;
-  color: #333;
+  transition: all 0.3s ease;
+  color: var(--text-secondary);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  backdrop-filter: var(--glass-blur);
 }
 
 .book-tab.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--gradient-primary);
   color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(129, 140, 248, 0.4);
 }
 
 .book-tab:hover:not(.active) {
-  background: #e8e8e8;
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
   transform: translateY(-2px);
 }
 
@@ -99,7 +103,7 @@ function handleDelete(bookId, event) {
   right: -6px;
   width: 18px;
   height: 18px;
-  background: #f44336;
+  background: var(--danger);
   color: white;
   border: none;
   border-radius: 50%;
@@ -107,19 +111,20 @@ function handleDelete(bookId, event) {
   line-height: 1;
   cursor: pointer;
   opacity: 0;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .book-tab-wrapper:hover .book-tab-delete {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .book-tab-delete:hover {
   transform: scale(1.2);
-  background: #d32f2f;
+  background: var(--danger-light);
+  opacity: 1;
 }
 
 </style>

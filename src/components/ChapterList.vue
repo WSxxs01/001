@@ -153,31 +153,32 @@ function deleteChapter(chapterIndex) {
 }
 
 .chapter-accordion {
-  background: #fafafa;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
 
 .chapter-accordion:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 15px rgba(102,126,234,0.1);
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .chapter-accordion.learned {
-  background: linear-gradient(135deg, #e8f5e9, #f1f8f1);
-  border-color: #81c784;
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(52, 211, 153, 0.05));
+  border-color: rgba(52, 211, 153, 0.3);
 }
 
 .chapter-accordion.today-review {
-  background: linear-gradient(135deg, #fff3e0, #fff8e8);
-  border-color: #ffb74d;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
+  border-color: rgba(251, 191, 36, 0.3);
 }
 
 .chapter-accordion.overdue {
-  background: linear-gradient(135deg, #ffebee, #fff5f5);
-  border-color: #ef5350;
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.1), rgba(239, 68, 68, 0.05));
+  border-color: rgba(248, 113, 113, 0.3);
 }
 
 .chapter-header {
@@ -192,7 +193,7 @@ function deleteChapter(chapterIndex) {
 }
 
 .chapter-header:hover {
-  background: rgba(102,126,234,0.05);
+  background: var(--glass-bg-hover);
 }
 
 .chapter-header-left {
@@ -209,11 +210,11 @@ function deleteChapter(chapterIndex) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0e0e0;
-  border-radius: 6px;
-  transition: transform 0.3s;
+  background: var(--glass-bg);
+  border-radius: var(--radius-sm);
+  transition: transform 0.3s ease;
   font-size: 12px;
-  color: #666;
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
@@ -223,7 +224,7 @@ function deleteChapter(chapterIndex) {
 
 .chapter-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   font-size: 14px;
   flex: 1;
   min-width: 0;
@@ -233,7 +234,7 @@ function deleteChapter(chapterIndex) {
 }
 
 .chapter-alert-badge {
-  background: #f44336;
+  background: var(--danger);
   color: white;
   font-size: 10px;
   font-weight: bold;
@@ -258,21 +259,21 @@ function deleteChapter(chapterIndex) {
 .chapter-progress-bar {
   width: 80px;
   height: 6px;
-  background: #e0e0e0;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
   overflow: hidden;
 }
 
 .chapter-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: var(--gradient-primary);
   border-radius: 3px;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
 }
 
 .chapter-progress-text {
   font-size: 12px;
-  color: #666;
+  color: var(--text-secondary);
   min-width: 50px;
   text-align: right;
 }
@@ -280,29 +281,30 @@ function deleteChapter(chapterIndex) {
 .chapter-delete-btn {
   background: transparent;
   border: none;
-  color: #bbb;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px 8px;
   font-size: 16px;
-  border-radius: 4px;
-  transition: all 0.2s;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
   opacity: 0;
   margin-left: 10px;
 }
 
 .chapter-header:hover .chapter-delete-btn {
-  opacity: 1;
+  opacity: 0.6;
 }
 
 .chapter-delete-btn:hover {
-  color: #f44336;
-  background: #ffebee;
+  color: var(--danger);
+  background: rgba(248, 113, 113, 0.2);
+  opacity: 1;
 }
 
 .section-list {
   display: none;
-  border-top: 1px solid #e0e0e0;
-  background: white;
+  border-top: 1px solid var(--card-border);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .chapter-accordion.expanded .section-list {
@@ -312,9 +314,10 @@ function deleteChapter(chapterIndex) {
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #999;
-  background: #fafafa;
-  border-radius: 12px;
+  color: var(--text-muted);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
 }
 
 @media (max-width: 768px) {

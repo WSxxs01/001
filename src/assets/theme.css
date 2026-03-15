@@ -1,0 +1,166 @@
+/**
+ * 极光暗夜玻璃拟物化主题 - 全局 CSS 变量
+ * Aurora Dark Glassmorphism Theme
+ */
+
+:root {
+  /* ==================== 背景色 ==================== */
+  --bg-base: #0a0e17;
+  --bg-deep: #060810;
+
+  /* 极光渐变色 */
+  --aurora-1: rgba(120, 60, 200, 0.25);
+  --aurora-2: rgba(20, 140, 160, 0.2);
+  --aurora-3: rgba(80, 60, 180, 0.15);
+
+  /* ==================== 玻璃拟物化 ==================== */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-hover: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-hover: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --glass-blur: blur(12px);
+
+  /* ==================== 卡片颜色 ==================== */
+  --card-bg: rgba(20, 25, 40, 0.7);
+  --card-border: rgba(100, 120, 180, 0.15);
+
+  /* ==================== 文字颜色 ==================== */
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* ==================== 主题色 ==================== */
+  --primary: #818cf8;
+  --primary-light: #a5b4fc;
+  --primary-dark: #6366f1;
+
+  --success: #34d399;
+  --success-light: #6ee7b7;
+
+  --warning: #fbbf24;
+  --warning-light: #fcd34d;
+
+  --danger: #f87171;
+  --danger-light: #fca5a5;
+
+  --info: #38bdf8;
+
+  /* ==================== 渐变色 ==================== */
+  --gradient-primary: linear-gradient(135deg, #818cf8, #6366f1);
+  --gradient-success: linear-gradient(135deg, #34d399, #10b981);
+  --gradient-warning: linear-gradient(135deg, #fbbf24, #f59e0b);
+  --gradient-danger: linear-gradient(135deg, #f87171, #ef4444);
+  --gradient-bg: linear-gradient(135deg, #1e293b, #0f172a);
+
+  /* ==================== 间距 & 圆角 ==================== */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+
+  /* ==================== 字体 ==================== */
+  --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 全局重置 */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-family);
+  background-color: var(--bg-base);
+  background-image:
+    radial-gradient(circle at 20% 80%, var(--aurora-1), transparent 55%),
+    radial-gradient(circle at 80% 20%, var(--aurora-2), transparent 50%),
+    radial-gradient(circle at 40% 40%, var(--aurora-3), transparent 60%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-base) 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* 玻璃卡片基础样式 */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* 按钮基础样式 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+}
+
+.btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 选择文字颜色 */
+::selection {
+  background: rgba(129, 140, 248, 0.4);
+  color: white;
+}
