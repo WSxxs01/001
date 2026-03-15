@@ -13,7 +13,7 @@ const reviewChartRef = ref(null)
 let memoryChart = null
 let reviewChart = null
 
-// 计算未来7天复习统计
+// 计算未来7天复习统计（支持 FSRS 算法）
 function getReviewStatsForNext7Days() {
   const today = getToday()
   const stats = []
@@ -29,20 +29,36 @@ function getReviewStatsForNext7Days() {
     let pending = 0
 
     Object.values(store.studyData).forEach(data => {
-      if (!data || !data.learned || !data.reviews) return
+      if (!data || !data.learned) return
 
-      const hasReviewOnDay = data.reviews.some(r => r.scheduledDate === dateStr)
-      const hasOverdue = data.reviews.some(r => !r.completed && r.scheduledDate < today)
-      const allCompleted = data.reviews.every(r => r.completed)
+      // FSRS 算法：使用 due 字段判断复习日期
+      if (data.fsrsCard && data.due) {
+        const dueDate = data.due
+        if (dueDate < today) {
+          // 已逾期
+          if (i === 0) overdue++
+        } else if (dueDate === dateStr) {
+          if (i === 0) {
+            todayReview++
+          } else {
+            pending++
+          }
+        }
+      } else if (data.reviews) {
+        // 兼容旧数据：SM-2 算法
+        const hasReviewOnDay = data.reviews.some(r => r.scheduledDate === dateStr)
+        const hasOverdue = data.reviews.some(r => !r.completed && r.scheduledDate < today)
+        const allCompleted = data.reviews.every(r => r.completed)
 
-      if (allCompleted) {
-        completed++
-      } else if (i === 0 && hasReviewOnDay) {
-        todayReview++
-      } else if (i === 0 && hasOverdue) {
-        overdue++
-      } else if (hasReviewOnDay) {
-        pending++
+        if (allCompleted) {
+          completed++
+        } else if (i === 0 && hasReviewOnDay) {
+          todayReview++
+        } else if (i === 0 && hasOverdue) {
+          overdue++
+        } else if (hasReviewOnDay) {
+          pending++
+        }
       }
     })
 
@@ -201,8 +217,9 @@ watch(
   { deep: true }
 )
 
-onMounted(() => {
-  store.initStore()
+onMounted(async () => {
+  // 等待 store 初始化完成后再渲染图表
+  await store.initStore()
   initCharts()
 })
 </script>

@@ -494,13 +494,13 @@ export const useStudyStore = defineStore('study', () => {
     const dueDate = data.due
     if (!dueDate) return 'learning'
 
-    // 使用日期对象比较
+    // 使用日期比较
     if (dueDate < today) return 'overdue'
     if (dueDate === today) return 'today'
 
-    // 根据难度判断状态
-    if (data.difficulty < 3) return 'completed'
-    if (data.interval > 21) return 'completed'
+    // 距离下次复习还有时间，标记为学习中
+    // 如果已经复习了很多次（间隔大于30天），可以认为已掌握
+    if (data.interval > 30) return 'completed'
 
     return 'learning'
   }
