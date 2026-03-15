@@ -358,6 +358,10 @@ export const useStudyStore = defineStore('study', () => {
       // 保存历史状态（用于撤销）
       pushHistory(sectionKey, data)
 
+      console.log('[DEBUG] 复习数据:', JSON.stringify(data))
+      console.log('[DEBUG] fsrsCard:', data.fsrsCard)
+      console.log('[DEBUG] fsrsCard.state:', data.fsrsCard?.state)
+
       const fsrsResult = scheduleNextReview(data, feedback)
 
       // 第三重保护：检查 FSRS 结果

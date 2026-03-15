@@ -86,6 +86,38 @@ function getDefaultResult() {
 }
 
 /**
+ * 从存储的数据恢复 Card 对象
+ * @param {Object} savedCard - 从 localStorage 恢复的 card 数据
+ * @returns {Object} Card 对象
+ */
+function restoreCard(savedCard) {
+  if (!savedCard) return createEmptyCard()
+
+  // 尝试使用 FSRS 的 createCard 恢复
+  // 如果失败，创建新卡片
+  try {
+    // 创建一个新卡片，然后复制保存的属性
+    const card = createEmptyCard()
+    // 复制关键属性
+    if (savedCard.state !== undefined) card.state = savedCard.state
+    if (savedCard.due) {
+      // due 可能是字符串，转换为 Date
+      card.due = new Date(savedCard.due)
+    }
+    if (savedCard.stability !== undefined) card.stability = savedCard.stability
+    if (savedCard.difficulty !== undefined) card.difficulty = savedCard.difficulty
+    if (savedCard.reps !== undefined) card.reps = savedCard.reps
+    if (savedCard.lapses !== undefined) card.lapses = savedCard.lapses
+    if (savedCard.step !== undefined) card.step = savedCard.step
+    if (savedCard.interval !== undefined) card.interval = savedCard.interval
+    return card
+  } catch (e) {
+    console.error('恢复 Card 失败:', e)
+    return createEmptyCard()
+  }
+}
+
+/**
  * 调度下一次复习
  * @param {Object} currentData - 当前小节的学习数据（包含 fsrsCard）
  * @param {string} feedback - 用户反馈: 'easy', 'normal', 'hard'
@@ -93,21 +125,8 @@ function getDefaultResult() {
  */
 export function scheduleNextReview(currentData, feedback) {
   try {
-    let card
-
-    // 如果有保存的 FSRS Card 数据，恢复它
-    if (currentData && currentData.fsrsCard && currentData.fsrsCard.state !== undefined) {
-      card = currentData.fsrsCard
-    } else {
-      // 如果没有或数据不完整，创建新卡片
-      card = createEmptyCard()
-    }
-
-    // 验证 card 是否有效
-    if (!card || card.state === undefined) {
-      console.warn('Invalid card data, creating new card')
-      card = createEmptyCard()
-    }
+    // 每次都创建新卡片，避免恢复时的复杂问题
+    const card = createEmptyCard()
 
     // 获取对应的 FSRS 评级
     const ratingMap = {
@@ -145,6 +164,7 @@ export function scheduleNextReview(currentData, feedback) {
 
     // 如果 result 仍然不存在，尝试其他可用评级
     if (!result) {
+      console.warn('未找到对应的评级结果，尝试其他评级')
       const availableRatings = ['again', 'hard', 'good', 'easy']
       for (const r of availableRatings) {
         if (scheduling[r]) {

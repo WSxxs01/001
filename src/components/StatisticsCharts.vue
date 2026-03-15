@@ -18,6 +18,9 @@ function getReviewStatsForNext7Days() {
   const today = getToday()
   const stats = []
 
+  console.log('[DEBUG] today:', today)
+  console.log('[DEBUG] studyData:', store.studyData)
+
   for (let i = 0; i < 7; i++) {
     const date = new Date(today)
     date.setDate(date.getDate() + i)
@@ -34,10 +37,17 @@ function getReviewStatsForNext7Days() {
       // FSRS 算法：使用 due 字段判断复习日期
       if (data.fsrsCard && data.due) {
         const dueDate = data.due
+        console.log(`[DEBUG] dueDate: ${dueDate}, today: ${today}, compare: ${dueDate < today}, ${dueDate === today}`)
+
         if (dueDate < today) {
           // 已逾期
+          console.log('[DEBUG] 逾期:', data)
           if (i === 0) overdue++
+        } else if (dueDate === today) {
+          // 今天是复习日
+          if (i === 0) todayReview++
         } else if (dueDate === dateStr) {
+          // 未来的某天是复习日
           if (i === 0) {
             todayReview++
           } else {
@@ -65,6 +75,7 @@ function getReviewStatsForNext7Days() {
     stats.push({ date: dateStr, completed, todayReview, overdue, pending, label: `第${i + 1}天` })
   }
 
+  console.log('[DEBUG] stats:', stats)
   return stats
 }
 
@@ -212,6 +223,7 @@ function initCharts() {
 watch(
   () => store.studyData,
   () => {
+    console.log('[WATCH] studyData 变化，重新渲染图表')
     renderReviewChart()
   },
   { deep: true }
