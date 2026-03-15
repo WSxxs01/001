@@ -25,7 +25,6 @@ let undoSnackbarTimer = null
 
 function showUndoNotification() {
   showUndoSnackbar.value = true
-  // 4秒后自动关闭
   if (undoSnackbarTimer) clearTimeout(undoSnackbarTimer)
   undoSnackbarTimer = setTimeout(() => {
     showUndoSnackbar.value = false
@@ -36,7 +35,6 @@ function handleUndo() {
   if (store.canUndo) {
     store.undoLastAction()
     showUndoSnackbar.value = false
-    // 刷新界面
     store.initStore()
   }
 }
@@ -56,7 +54,6 @@ onMounted(async () => {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault()
     deferredPrompt.value = e
-    // 只有在非 PWA 模式下才显示
     if (!window.matchMedia('(display-mode: standalone)').matches) {
       showInstallPrompt.value = true
     }
@@ -91,37 +88,41 @@ function openAddBookModal() {
 
 <template>
   <div class="app">
-    <h1>
-      📚 艾宾浩斯复习打卡系统
-      <button class="settings-btn" @click="settingsModal?.openModal()" title="同步设置">⚙️</button>
-    </h1>
+    <!-- 页面顶部光晕效果 -->
+    <div class="ambient-light"></div>
+
+    <!-- 标题区域 -->
+    <header class="app-header">
+      <h1>
+        <span class="title-icon">📚</span>
+        <span class="title-text">艾宾浩斯复习打卡系统</span>
+      </h1>
+      <button
+        class="settings-btn"
+        @click="settingsModal?.openModal()"
+        title="同步设置"
+        aria-label="同步设置"
+      >
+        <span class="btn-icon">⚙️</span>
+      </button>
+    </header>
 
     <!-- 顶部统计卡片 -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="number">{{ store.totalSections }}</div>
-        <div class="label">总小节</div>
+    <section class="stats-row">
+      <div class="stat-card glass-panel" v-for="(stat, index) in [
+        { label: '总小节', value: store.totalSections, key: 'total' },
+        { label: '已学习', value: store.learnedCount, key: 'success' },
+        { label: '今日待复习', value: store.todayReviewCount, key: 'warning' },
+        { label: '已逾期', value: store.overdueCount, key: 'danger' },
+        { label: '复习队列', value: store.reviewQueue.length, key: 'info' }
+      ]" :key="stat.key" :class="stat.key">
+        <div class="number">{{ stat.value }}</div>
+        <div class="label">{{ stat.label }}</div>
       </div>
-      <div class="stat-card success">
-        <div class="number">{{ store.learnedCount }}</div>
-        <div class="label">已学习</div>
-      </div>
-      <div class="stat-card warning">
-        <div class="number">{{ store.todayReviewCount }}</div>
-        <div class="label">今日待复习</div>
-      </div>
-      <div class="stat-card danger">
-        <div class="number">{{ store.overdueCount }}</div>
-        <div class="label">已逾期</div>
-      </div>
-      <div class="stat-card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(6, 182, 212, 0.1));">
-        <div class="number" style="color: var(--info)">{{ store.reviewQueue.length }}</div>
-        <div class="label">复习队列</div>
-      </div>
-    </div>
+    </section>
 
     <!-- 学习进度条 -->
-    <div class="progress-section">
+    <section class="progress-section glass-panel">
       <div class="progress-bar">
         <div
           class="progress-fill"
@@ -130,45 +131,55 @@ function openAddBookModal() {
       </div>
       <div class="progress-text">
         学习进度：{{ store.totalSections ? Math.round(store.learnedCount / store.totalSections * 100) : 0 }}%
-        ({{ store.learnedCount }}/{{ store.totalSections }}小节)
+        <span class="progress-detail">({{ store.learnedCount }}/{{ store.totalSections }} 小节)</span>
       </div>
-    </div>
+    </section>
 
     <!-- 专注复习模式按钮 -->
-    <div class="focus-review-section">
+    <section class="focus-review-section">
       <button
         class="focus-review-btn"
         :class="{ disabled: store.dueQueue.length === 0 }"
         @click="reviewModal?.openModal()"
+        :aria-disabled="store.dueQueue.length === 0"
       >
-        <span class="focus-icon">🚀</span>
-        <span class="focus-text" v-if="store.dueQueue.length > 0">开始今日复习 (共 {{ store.dueQueue.length }} 个任务)</span>
-        <span class="focus-text" v-else>☕ 今日复习已清空，好好休息吧</span>
+        <span class="focus-icon">{{ store.dueQueue.length > 0 ? '🚀' : '☕' }}</span>
+        <span class="focus-text" v-if="store.dueQueue.length > 0">
+          开始今日复习 <span class="count-badge">{{ store.dueQueue.length }}</span>
+        </span>
+        <span class="focus-text" v-else>今日复习已清空，好好休息吧</span>
       </button>
-    </div>
+    </section>
 
     <!-- 今日待复习提示 -->
-    <div v-if="store.todayReviewCount > 0" class="today-alert">
-      <h3>🔔 今日待复习 ({{ store.todayReviewCount }}个)</h3>
-    </div>
-
-    <!-- 学习热力图 -->
-    <ContributionHeatmap />
+    <aside v-if="store.todayReviewCount > 0" class="today-alert">
+      <span class="alert-icon">🔔</span>
+      <span class="alert-text">今日待复习 {{ store.todayReviewCount }} 个任务</span>
+    </aside>
 
     <!-- 图表区域 -->
     <StatisticsCharts />
 
+    <!-- 学习热力图 -->
+    <ContributionHeatmap />
+
     <!-- 书籍章节区域 -->
-    <div class="panel">
-      <h2>📖 书籍章节</h2>
+    <section class="panel glass-panel">
+      <header class="panel-header">
+        <h2>
+          <span class="panel-icon">📖</span>
+          <span>书籍章节</span>
+        </h2>
+      </header>
       <div class="tab-actions">
         <BookTabs />
         <button class="add-btn" @click="openAddBookModal">
-          + 添加书籍/科目
+          <span class="btn-icon">+</span>
+          <span>添加书籍/科目</span>
         </button>
       </div>
       <ChapterList @reviewSubmitted="showUndoNotification" />
-    </div>
+    </section>
 
     <!-- 添加书籍弹窗 -->
     <AddBookModal ref="addBookModal" />
@@ -176,9 +187,10 @@ function openAddBookModal() {
     <!-- 撤销提示 Snackbar -->
     <Transition name="slide">
       <div v-if="showUndoSnackbar" class="undo-snackbar">
-        <span>✅ 打卡成功</span>
+        <span class="snackbar-icon">✅</span>
+        <span class="snackbar-text">打卡成功</span>
         <button class="undo-btn" @click="handleUndo">撤销</button>
-        <button class="undo-dismiss" @click="showUndoSnackbar = false">×</button>
+        <button class="snackbar-dismiss" @click="showUndoSnackbar = false">✕</button>
       </div>
     </Transition>
 
@@ -192,269 +204,266 @@ function openAddBookModal() {
     <DataManagement />
 
     <!-- PWA 安装提示 -->
-    <div v-if="showInstallPrompt" class="pwa-install-banner">
-      <span>📲 添加到手机桌面，随时随地复习！</span>
-      <div class="pwa-actions">
-        <button class="pwa-install-btn" @click="installPWA">安装</button>
-        <button class="pwa-dismiss-btn" @click="dismissInstallPrompt">×</button>
+    <Transition name="slideUp">
+      <div v-if="showInstallPrompt" class="pwa-install-banner">
+        <span class="pwa-icon">📲</span>
+        <span class="pwa-text">添加到手机桌面，随时随地复习！</span>
+        <div class="pwa-actions">
+          <button class="pwa-install-btn" @click="installPWA">安装</button>
+          <button class="pwa-dismiss-btn" @click="dismissInstallPrompt" aria-label="关闭">✕</button>
+        </div>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* ============================================
+   APP 全局布局
+   ============================================ */
 .app {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 24px;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* 环境光效 */
+.ambient-light {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse at center, rgba(94, 106, 210, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ============================================
+   应用标题
+   ============================================ */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  position: relative;
 }
 
 h1 {
   text-align: center;
   color: var(--text-primary);
-  margin-bottom: 25px;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.settings-btn {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  font-size: 20px;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  margin-left: 15px;
-  vertical-align: middle;
-  transition: all 0.3s ease;
-  backdrop-filter: var(--glass-blur);
-  color: var(--text-primary);
+.title-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 0 8px rgba(94, 106, 210, 0.4));
 }
 
-.settings-btn:hover {
-  background: var(--glass-bg-hover);
-  border-color: var(--glass-border-hover);
-  transform: rotate(30deg);
-}
-
-/* 统计卡片 - 应用 glass-panel */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  /* 应用 .glass-panel 样式 */
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xl);
-  padding: 20px 15px;
-  text-align: center;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
-}
-
-.stat-card .number {
-  font-size: 36px;
-  font-weight: 700;
-  background: var(--gradient-primary);
+.title-text {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 10px rgba(255,255,255,0.2);
+}
+
+.settings-btn {
+  position: absolute;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+  transform: rotate(30deg);
+}
+
+.settings-btn .btn-icon {
+  font-size: 18px;
+  pointer-events: none;
+}
+
+/* ============================================
+   统计卡片网格
+   ============================================ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.stat-card.total:hover {
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(94, 106, 210, 0.2);
+}
+
+.stat-card.success:hover {
+  border-color: var(--success);
+  box-shadow: 0 8px 24px rgba(77, 175, 115, 0.2);
+}
+
+.stat-card.warning:hover {
+  border-color: var(--warning);
+  box-shadow: 0 8px 24px rgba(226, 179, 64, 0.2);
+}
+
+.stat-card.danger:hover {
+  border-color: var(--danger);
+  box-shadow: 0 8px 24px rgba(229, 72, 77, 0.2);
+}
+
+.stat-card.info:hover {
+  border-color: var(--info);
+  box-shadow: 0 8px 24px rgba(94, 156, 230, 0.2);
+}
+
+.stat-card .number {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  /* 纵向渐变文字效果 */
+  background: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.6) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stat-card.total .number {
+  text-shadow: 0 0 20px rgba(94, 106, 210, 0.3);
 }
 
 .stat-card.success .number {
-  background: var(--gradient-success);
-  -webkit-background-clip: text;
-  background-clip: text;
-  text-shadow: 0 2px 10px rgba(52, 211, 153, 0.3);
+  text-shadow: 0 0 20px rgba(77, 175, 115, 0.3);
 }
 
 .stat-card.warning .number {
-  background: var(--gradient-warning);
-  -webkit-background-clip: text;
-  background-clip: text;
-  text-shadow: 0 2px 10px rgba(251, 191, 36, 0.3);
+  text-shadow: 0 0 20px rgba(226, 179, 64, 0.3);
 }
 
 .stat-card.danger .number {
-  background: var(--gradient-danger);
-  -webkit-background-clip: text;
-  background-clip: text;
-  text-shadow: 0 2px 10px rgba(248, 113, 113, 0.3);
+  text-shadow: 0 0 20px rgba(229, 72, 77, 0.3);
+}
+
+.stat-card.info .number {
+  text-shadow: 0 0 20px rgba(94, 156, 230, 0.3);
 }
 
 .stat-card .label {
-  color: var(--text-secondary);
-  margin-top: 5px;
-  font-size: 13px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-/* 进度条 - 底轨 + 渐变发光 */
+/* ============================================
+   进度条
+   ============================================ */
 .progress-section {
-  /* 应用 .glass-panel 样式 */
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xl);
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  padding: 24px;
+  margin-bottom: 24px;
 }
 
 .progress-bar {
-  height: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
   overflow: hidden;
+  position: relative;
 }
 
 .progress-fill {
   height: 100%;
-  background: var(--gradient-chart);
-  transition: width 0.5s ease;
-  border-radius: 6px;
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.3);
+  background: #5E6AD2;
+  border-radius: var(--radius-full);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 0 10px rgba(94, 106, 210, 0.5);
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .progress-text {
   text-align: center;
-  margin-top: 10px;
+  margin-top: 14px;
   color: var(--text-secondary);
   font-size: 14px;
 }
 
-/* 今日提醒 */
-.today-alert {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1));
-  border-left: 4px solid var(--warning);
-  padding: 15px 20px;
-  border-radius: var(--radius-md);
-  margin-bottom: 20px;
-  backdrop-filter: var(--glass-blur);
+.progress-detail {
+  color: var(--text-muted);
+  margin-left: 8px;
 }
 
-.today-alert h3 {
-  color: var(--warning-light);
-  font-size: 16px;
-}
-
-/* 面板 - 应用 glass-panel */
-.panel {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xl);
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-}
-
-.panel h2 {
-  color: var(--text-primary);
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--card-border);
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.tab-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.add-btn {
-  /* 应用 .glass-btn 样式 */
-  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: var(--radius-md);
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--success-light);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-.add-btn:hover {
-  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(52, 211, 153, 0.3);
-  border-color: rgba(255,255,255,0.35);
-}
-
-.add-btn:active {
-  transform: scale(0.96);
-}
-
-/* 专注复习模式按钮 */
+/* ============================================
+   专注复习按钮
+   ============================================ */
 .focus-review-section {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .focus-review-btn {
   width: 100%;
-  padding: 20px 30px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.2));
-  border: 1px solid rgba(139, 92, 246, 0.4);
+  padding: 20px 32px;
+  background: linear-gradient(135deg, var(--primary) 0%, #8B5CF6 100%);
+  border: none;
   border-radius: var(--radius-xl);
-  color: #f1f5f9;
-  font-size: 18px;
+  color: white;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
-  animation: focusPulse 2s ease-in-out infinite;
+  transition: all var(--transition-normal);
+  box-shadow: 0 4px 20px rgba(94, 106, 210, 0.3), 0 0 0 1px rgba(255,255,255,0.1) inset;
   position: relative;
   overflow: hidden;
-}
-
-@keyframes focusPulse {
-  0%, 100% {
-    box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 50px rgba(139, 92, 246, 0.5), 0 0 80px rgba(6, 182, 212, 0.3);
-  }
 }
 
 .focus-review-btn::before {
@@ -464,8 +473,8 @@ h1 {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  transition: left 0.5s ease;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
 }
 
 .focus-review-btn:hover::before {
@@ -473,8 +482,8 @@ h1 {
 }
 
 .focus-review-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 40px rgba(139, 92, 246, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(94, 106, 210, 0.4), 0 0 0 1px rgba(255,255,255,0.15) inset;
 }
 
 .focus-review-btn:active {
@@ -482,43 +491,323 @@ h1 {
 }
 
 .focus-review-btn.disabled {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
   cursor: not-allowed;
-  animation: none;
   box-shadow: none;
 }
 
-.focus-review-btn.disabled .focus-text {
-  color: var(--text-muted);
+.focus-review-btn.disabled:hover {
+  transform: none;
+}
+
+.focus-review-btn.disabled::before {
+  display: none;
 }
 
 .focus-icon {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .focus-text {
-  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* 响应式 */
+.count-badge {
+  background: rgba(255,255,255,0.2);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ============================================
+   今日提醒
+   ============================================ */
+.today-alert {
+  background: var(--warning-subtle);
+  border: 1px solid rgba(226, 179, 64, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--warning);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.alert-icon {
+  font-size: 16px;
+}
+
+/* ============================================
+   主面板
+   ============================================ */
+.panel {
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.panel-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-faint);
+}
+
+.panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.panel-icon {
+  font-size: 20px;
+}
+
+.tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+}
+
+.add-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.add-btn .btn-icon {
+  font-size: 16px;
+  pointer-events: none;
+}
+
+/* ============================================
+   Snackbar
+   ============================================ */
+.undo-snackbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-xl);
+  z-index: 9999;
+}
+
+.snackbar-icon {
+  font-size: 16px;
+}
+
+.snackbar-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.undo-btn {
+  padding: 6px 14px;
+  background: var(--warning-subtle);
+  border: 1px solid rgba(226, 179, 64, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--warning);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.undo-btn:hover {
+  background: rgba(226, 179, 64, 0.25);
+}
+
+.snackbar-dismiss {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.snackbar-dismiss:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   PWA 安装提示
+   ============================================ */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  color: var(--text-primary);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-xl);
+  z-index: 1000;
+}
+
+.pwa-icon {
+  font-size: 24px;
+}
+
+.pwa-text {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.pwa-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pwa-install-btn {
+  padding: 8px 18px;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pwa-install-btn:hover {
+  background: var(--primary-hover);
+  transform: scale(1.02);
+}
+
+.pwa-dismiss-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.pwa-dismiss-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+/* ============================================
+   过渡动画
+   ============================================ */
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(-50%) translateY(100%);
+  opacity: 0;
+}
+
+.slideUp-enter-active,
+.slideUp-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slideUp-enter-from,
+.slideUp-leave-to {
+  transform: translateX(-50%) translateY(100%);
+  opacity: 0;
+}
+
+/* ============================================
+   响应式
+   ============================================ */
+@media (max-width: 1024px) {
+  .stats-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .app {
-    padding: 10px;
+    padding: 16px;
   }
 
   h1 {
-    font-size: 22px;
-    margin-bottom: 15px;
+    font-size: 20px;
+  }
+
+  .title-text {
+    display: none;
+  }
+
+  .title-icon {
+    font-size: 24px;
+  }
+
+  .settings-btn {
+    width: 36px;
+    height: 36px;
   }
 
   .stats-row {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 
   .stat-card {
-    padding: 12px 8px;
+    padding: 16px 12px;
   }
 
   .stat-card .number {
@@ -529,9 +818,36 @@ h1 {
     font-size: 11px;
   }
 
+  .focus-review-btn {
+    padding: 16px 20px;
+    font-size: 14px;
+  }
+
   .tab-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .add-btn {
+    justify-content: center;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .pwa-install-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+    max-width: 90%;
+  }
+
+  .undo-snackbar {
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    text-align: center;
   }
 }
 
@@ -539,132 +855,35 @@ h1 {
   .stats-row {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .stat-card:nth-child(5) {
+    grid-column: span 2;
+  }
 }
 
-/* PWA 安装提示 */
-.pwa-install-banner {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  color: var(--text-primary);
-  padding: 12px 20px;
-  border-radius: var(--radius-lg);
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  box-shadow: var(--glass-shadow);
-  z-index: 1000;
-  animation: slideUp 0.3s ease;
+/* ============================================
+   移动端触摸优化（核心修复保留）
+   ============================================ */
+@media (pointer: coarse) {
+  button:hover {
+    /* 触摸设备禁用 hover 效果 */
+  }
+
+  button:active {
+    opacity: 0.8;
+  }
 }
 
-@keyframes slideUp {
-  from { transform: translateX(-50%) translateY(100%); opacity: 0; }
-  to { transform: translateX(-50%) translateY(0); opacity: 1; }
-}
-
-.pwa-install-banner span {
-  font-size: 14px;
-}
-
-.pwa-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pwa-install-btn {
-  background: var(--gradient-primary);
-  color: white;
-  border: none;
-  padding: 6px 16px;
-  border-radius: var(--radius-md);
-  font-size: 13px;
-  font-weight: 600;
+button {
   cursor: pointer;
-  transition: transform 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.pwa-install-btn:hover {
-  transform: scale(1.05);
-}
-
-.pwa-dismiss-btn {
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--glass-border);
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.pwa-dismiss-btn:hover {
-  background: var(--glass-bg-hover);
-  color: var(--text-primary);
-}
-
-/* 撤销 Snackbar */
-.undo-snackbar {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  color: var(--text-primary);
-  padding: 12px 20px;
-  border-radius: var(--radius-lg);
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  box-shadow: var(--glass-shadow);
-  z-index: 1001;
-}
-
-.undo-snackbar span {
-  font-size: 14px;
-}
-
-.undo-btn {
-  background: var(--gradient-warning);
-  color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  border: none;
-  padding: 6px 16px;
-  border-radius: var(--radius-md);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.undo-btn:hover {
-  transform: scale(1.05);
-}
-
-.undo-dismiss:hover {
-  color: var(--text-primary);
-}
-
-/* Transition */
-.slide-enter-active,
-.slide-leave-active {
-  transition: all 0.3s ease;
-}
-
-.slide-enter-from,
-.slide-leave-to {
-  transform: translateX(-50%) translateY(100%);
-  opacity: 0;
+button * {
+  pointer-events: none !important;
 }
 </style>

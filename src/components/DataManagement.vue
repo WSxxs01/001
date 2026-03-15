@@ -82,21 +82,28 @@ function handleImport(event) {
 
 <style scoped>
 .data-management {
-  /* 应用 .glass-panel 样式 */
+  /* Linear glass-panel 样式 */
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 2px 20px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(0, 0, 0, 0.2);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .data-management:hover {
   background: rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(94, 106, 210, 0.1);
+  transform: translateY(-2px);
 }
 
 .data-management h3 {
@@ -125,31 +132,16 @@ function handleImport(event) {
   gap: 6px;
 }
 
-.btn-primary {
-  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 100%);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: var(--primary-light);
-  backdrop-filter: blur(10px);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.05) 100%);
-  box-shadow: 0 4px 15px rgba(129, 140, 248, 0.3);
-}
-
-.btn-primary:active {
-  transform: scale(0.96);
-}
-
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-default);
   color: var(--text-secondary);
+  transition: all var(--transition-normal);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
 }
 </style>

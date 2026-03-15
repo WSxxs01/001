@@ -70,30 +70,32 @@ function handleDelete(bookId, event) {
 
 .book-tab {
   padding: 10px 20px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
   color: var(--text-secondary);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  backdrop-filter: var(--glass-blur);
 }
 
 .book-tab.active {
-  background: var(--gradient-primary);
+  background: #5E6AD2;
   color: white;
   border-color: transparent;
-  box-shadow: 0 4px 15px rgba(129, 140, 248, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(94, 106, 210, 0.5),
+    0 4px 12px rgba(94, 106, 210, 0.3),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 }
 
 .book-tab:hover:not(.active) {
-  background: var(--glass-bg-hover);
-  border-color: var(--glass-border-hover);
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
   transform: translateY(-2px);
 }
 
@@ -123,7 +125,7 @@ function handleDelete(bookId, event) {
 
 .book-tab-delete:hover {
   transform: scale(1.2);
-  background: var(--danger-light);
+  background: #F87171;
   opacity: 1;
 }
 

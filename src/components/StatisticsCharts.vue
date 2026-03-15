@@ -7,8 +7,8 @@ import { getToday } from '../utils/sm2'
 Chart.register(...registerables)
 
 // 强制设置图表全局文字颜色
-Chart.defaults.color = 'rgba(255, 255, 255, 0.8)'
-Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)'
+Chart.defaults.color = 'rgba(255, 255, 255, 0.6)'
+Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.05)'
 
 const store = useStudyStore()
 
@@ -100,6 +100,12 @@ function renderMemoryChart() {
   }
 
   const ctx = memoryChartRef.value.getContext('2d')
+
+  // 创建渐变背景：从 Accent 色 20% 透明度到完全透明
+  const gradient = ctx.createLinearGradient(0, 0, 0, 200)
+  gradient.addColorStop(0, 'rgba(94, 106, 210, 0.2)')
+  gradient.addColorStop(1, 'rgba(94, 106, 210, 0)')
+
   memoryChart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -107,12 +113,12 @@ function renderMemoryChart() {
       datasets: [{
         label: '记忆保持率',
         data: [100, 80, 70, 60, 55, 50, 40],
-        borderColor: '#06b6d4',
-        backgroundColor: 'rgba(6, 182, 212, 0.5)',
+        borderColor: '#5E6AD2',
+        backgroundColor: gradient,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#06b6d4',
-        pointBorderColor: 'rgba(255,255,255,0.8)',
+        pointBackgroundColor: '#ffffff',
+        pointBorderColor: '#5E6AD2',
         pointBorderWidth: 2,
         pointRadius: 5,
         pointHoverRadius: 7
@@ -136,21 +142,21 @@ function renderMemoryChart() {
       scales: {
         x: {
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
+            color: 'rgba(255, 255, 255, 0.05)'
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.8)'
+            color: 'rgba(255, 255, 255, 0.6)'
           }
         },
         y: {
           beginAtZero: true,
           max: 100,
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
+            color: 'rgba(255, 255, 255, 0.05)'
           },
           ticks: {
             callback: value => value + '%',
-            color: 'rgba(255, 255, 255, 0.8)'
+            color: 'rgba(255, 255, 255, 0.6)'
           }
         }
       }
@@ -181,24 +187,24 @@ function renderReviewChart() {
         {
           label: '今日/逾期',
           data: todayData,
-          backgroundColor: 'rgba(236, 72, 153, 0.8)',
-          borderColor: '#ec4899',
+          backgroundColor: 'rgba(244, 114, 182, 0.85)',
+          borderColor: '#f472b6',
           borderWidth: 0,
           borderRadius: 4
         },
         {
           label: '待复习',
           data: pendingData,
-          backgroundColor: 'rgba(249, 115, 22, 0.8)',
-          borderColor: '#f97316',
+          backgroundColor: 'rgba(251, 146, 60, 0.85)',
+          borderColor: '#fb923c',
           borderWidth: 0,
           borderRadius: 4
         },
         {
           label: '已完成',
           data: completedData,
-          backgroundColor: 'rgba(6, 182, 212, 0.8)',
-          borderColor: '#06b6d4',
+          backgroundColor: 'rgba(34, 211, 238, 0.85)',
+          borderColor: '#22d3ee',
           borderWidth: 0,
           borderRadius: 4
         }
@@ -213,7 +219,7 @@ function renderReviewChart() {
           labels: {
             usePointStyle: true,
             padding: 20,
-            color: 'rgba(255, 255, 255, 0.7)'
+            color: 'rgba(255, 255, 255, 0.6)'
           }
         },
         tooltip: {
@@ -231,18 +237,18 @@ function renderReviewChart() {
             display: false
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.8)'
+            color: 'rgba(255, 255, 255, 0.6)'
           }
         },
         y: {
           stacked: true,
           beginAtZero: true,
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
+            color: 'rgba(255, 255, 255, 0.05)'
           },
           ticks: {
             stepSize: 1,
-            color: 'rgba(255, 255, 255, 0.8)'
+            color: 'rgba(255, 255, 255, 0.6)'
           }
         }
       }
@@ -276,7 +282,7 @@ onMounted(async () => {
 
 <template>
   <div class="charts-section">
-    <div class="chart-card">
+    <div class="chart-card glass-panel">
       <h3>📊 艾宾浩斯遗忘曲线</h3>
       <div class="chart-container">
         <canvas ref="memoryChartRef"></canvas>
@@ -286,7 +292,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="chart-card">
+    <div class="chart-card glass-panel">
       <h3>📅 未来7天复习预览</h3>
       <div class="chart-container">
         <canvas ref="reviewChartRef"></canvas>
@@ -322,20 +328,7 @@ onMounted(async () => {
 }
 
 .chart-card {
-  /* 应用 .glass-panel 样式 */
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xl);
   padding: 20px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-}
-
-.chart-card:hover {
-  background: rgba(255, 255, 255, 0.06);
 }
 
 .chart-card h3 {

@@ -39,13 +39,13 @@ function getLevel(count) {
   return 4
 }
 
-// 颜色映射
+// 颜色映射 - Linear 规范荧光色系
 const colorMap = {
-  0: '#ebedf0',
-  1: '#c3b3ea',
-  2: '#9f81df',
-  3: '#764ba2',
-  4: '#5a3b8c'
+  0: 'rgba(255, 255, 255, 0.05)',
+  1: 'rgba(94, 156, 230, 0.5)',
+  2: 'rgba(94, 106, 210, 0.6)',
+  3: 'rgba(139, 92, 246, 0.75)',
+  4: 'rgba(168, 85, 247, 0.9)'
 }
 
 // 生成过去180天的日期网格
@@ -133,7 +133,7 @@ const totalStats = computed(() => {
 </script>
 
 <template>
-  <div class="heatmap-card">
+  <div class="heatmap-card glass-panel">
     <div class="heatmap-header">
       <h3>🔥 过去 180 天复习足迹</h3>
       <div class="heatmap-stats">
@@ -204,21 +204,8 @@ const totalStats = computed(() => {
 
 <style scoped>
 .heatmap-card {
-  /* 应用 .glass-panel 样式 */
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-xl);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-}
-
-.heatmap-card:hover {
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .heatmap-header {
@@ -298,10 +285,10 @@ const totalStats = computed(() => {
 .day-cell {
   width: 12px;
   height: 12px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: transform 0.1s ease;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform var(--transition-fast);
 }
 
 .day-cell:hover {
@@ -310,12 +297,12 @@ const totalStats = computed(() => {
   outline-offset: 1px;
 }
 
-/* 热力图颜色 - 荧光色系 */
-.day-cell.level-0 { background: rgba(255, 255, 255, 0.08); }
-.day-cell.level-1 { background: rgba(56, 189, 248, 0.6); box-shadow: 0 0 4px rgba(56, 189, 248, 0.3); }
-.day-cell.level-2 { background: rgba(139, 92, 246, 0.7); box-shadow: 0 0 4px rgba(139, 92, 246, 0.4); }
-.day-cell.level-3 { background: rgba(168, 85, 247, 0.8); box-shadow: 0 0 6px rgba(168, 85, 247, 0.5); }
-.day-cell.level-4 { background: rgba(236, 72, 153, 0.9); box-shadow: 0 0 8px rgba(236, 72, 153, 0.6); }
+/* 热力图颜色 - Linear 规范 */
+.day-cell.level-0 { background: rgba(255, 255, 255, 0.05); }
+.day-cell.level-1 { background: rgba(94, 156, 230, 0.5); box-shadow: 0 0 4px rgba(94, 156, 230, 0.2); }
+.day-cell.level-2 { background: rgba(94, 106, 210, 0.6); box-shadow: 0 0 4px rgba(94, 106, 210, 0.3); }
+.day-cell.level-3 { background: rgba(139, 92, 246, 0.75); box-shadow: 0 0 6px rgba(139, 92, 246, 0.4); }
+.day-cell.level-4 { background: rgba(168, 85, 247, 0.9); box-shadow: 0 0 8px rgba(168, 85, 247, 0.5); }
 
 .day-cell.is-today {
   outline: 2px solid var(--primary);
@@ -351,11 +338,11 @@ const totalStats = computed(() => {
   border-radius: 3px;
 }
 
-.legend-cell.level-0 { background: rgba(255, 255, 255, 0.08); }
-.legend-cell.level-1 { background: rgba(56, 189, 248, 0.6); }
-.legend-cell.level-2 { background: rgba(139, 92, 246, 0.7); }
-.legend-cell.level-3 { background: rgba(168, 85, 247, 0.8); }
-.legend-cell.level-4 { background: rgba(236, 72, 153, 0.9); }
+.legend-cell.level-0 { background: rgba(255, 255, 255, 0.05); }
+.legend-cell.level-1 { background: rgba(94, 156, 230, 0.5); }
+.legend-cell.level-2 { background: rgba(94, 106, 210, 0.6); }
+.legend-cell.level-3 { background: rgba(139, 92, 246, 0.75); }
+.legend-cell.level-4 { background: rgba(168, 85, 247, 0.9); }
 
 @media (max-width: 768px) {
   .heatmap-header {

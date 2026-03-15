@@ -1,179 +1,360 @@
 /**
- * 极光暗夜玻璃拟物化主题 - 全局 CSS 变量
- * Aurora Dark Glassmorphism Theme
+ * ============================================
+ * LINEAR 级极光暗夜设计系统
+ * Aurora Dark Glass Design System v2.0
+ * ============================================
+ *
+ * 核心原则：
+ * 1. 光影物理法则 - 所有光源从顶部来，底部暗
+ * 2. 纵深感 - 多层渐变背景营造空间感
+ * 3. 玻璃拟物 - 边缘高光、内阴影、模糊
+ * 4. 微交互 - 细腻的过渡动画
  */
 
 :root {
-  /* ==================== 背景色 ==================== */
-  --bg-base: #0b1120;
-  --bg-deep: #060810;
+  /* ==================== 基础色板 (Linear Palette) ==================== */
+  --bg-page: #050506;
+  --bg-surface: #0A0A0B;
+  --bg-elevated: #0E0E0F;
+  --bg-hover: rgba(255, 255, 255, 0.03);
+  --bg-active: rgba(255, 255, 255, 0.06);
 
-  /* 极光渐变色 */
-  --aurora-1: rgba(120, 60, 200, 0.25);
-  --aurora-2: rgba(20, 140, 160, 0.2);
-  --aurora-3: rgba(80, 60, 180, 0.15);
+  /* 边框颜色 */
+  --border-default: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.1);
+  --border-active: rgba(255, 255, 255, 0.15);
+  --border-faint: rgba(255, 255, 255, 0.04);
 
-  /* ==================== 玻璃拟物化 ==================== */
-  --glass-bg: rgba(15, 23, 42, 0.5);
-  --glass-bg-hover: rgba(15, 23, 42, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-border-hover: rgba(255, 255, 255, 0.2);
-  --glass-blur: blur(16px) saturate(180%);
+  /* 文字颜色 */
+  --text-primary: #EDEDEF;
+  --text-secondary: #8A8F98;
+  --text-muted: #55585F;
+  --text-faint: #3A3D42;
 
-  /* ==================== 卡片颜色 ==================== */
-  --card-bg: rgba(20, 25, 40, 0.7);
-  --card-border: rgba(100, 120, 180, 0.15);
+  /* 品牌色 */
+  --primary: #5E6AD2;
+  --primary-hover: #6E7AE2;
+  --primary-active: #4E5AC2;
+  --primary-subtle: rgba(94, 106, 210, 0.15);
 
-  /* ==================== 文字颜色 ==================== */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  /* 功能色 */
+  --success: #4DAF73;
+  --success-subtle: rgba(77, 175, 115, 0.15);
+  --warning: #E2B340;
+  --warning-subtle: rgba(226, 179, 64, 0.15);
+  --danger: #E5484D;
+  --danger-subtle: rgba(229, 72, 77, 0.15);
+  --info: #5E9CE6;
+  --info-subtle: rgba(94, 156, 230, 0.15);
 
-  /* ==================== 主题色 ==================== */
-  --primary: #818cf8;
-  --primary-light: #a5b4fc;
-  --primary-dark: #6366f1;
+  /* 渐变色 */
+  --gradient-primary: linear-gradient(135deg, #5E6AD2, #8B5CF6);
+  --gradient-success: linear-gradient(135deg, #4DAF73, #34D399);
+  --gradient-warning: linear-gradient(135deg, #E2B340, #FBBF24);
+  --gradient-danger: linear-gradient(135deg, #E5484D, #F87171);
+  --gradient-border: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
 
-  --success: #34d399;
-  --success-light: #6ee7b7;
+  /* 玻璃拟物 */
+  --glass-bg: rgba(14, 14, 16, 0.8);
+  --glass-bg-hover: rgba(20, 20, 22, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-highlight: rgba(255, 255, 255, 0.15);
+  --glass-blur: blur(20px);
 
-  --warning: #fbbf24;
-  --warning-light: #fcd34d;
+  /* 阴影系统 */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.7);
+  --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-glow: 0 0 20px rgba(94, 106, 210, 0.3);
 
-  --danger: #f87171;
-  --danger-light: #fca5a5;
+  /* 间距 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
 
-  --info: #38bdf8;
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
 
-  /* 荧光色图表 */
-  --chart-blue: #3b82f6;
-  --chart-purple: #8b5cf6;
-  --chart-cyan: #06b6d4;
-  --chart-orange: #f97316;
-  --chart-pink: #ec4899;
+  /* 动画 */
+  --transition-fast: 0.1s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
 
-  /* ==================== 渐变色 ==================== */
-  --gradient-primary: linear-gradient(135deg, #818cf8, #6366f1);
-  --gradient-success: linear-gradient(135deg, #34d399, #10b981);
-  --gradient-warning: linear-gradient(135deg, #fbbf24, #f59e0b);
-  --gradient-danger: linear-gradient(135deg, #f87171, #ef4444);
-  --gradient-bg: linear-gradient(135deg, #1e293b, #0f172a);
-  --gradient-chart: linear-gradient(90deg, #3b82f6, #8b5cf6);
-
-  /* ==================== 间距 & 圆角 ==================== */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 24px;
-
-  /* ==================== 字体 ==================== */
-  --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  /* 字体 */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
 }
 
-/* 全局重置 */
+/* ==================== 全局重置 ==================== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* ==================== 多层纵深背景系统 ==================== */
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  min-height: 100vh;
-  font-family: var(--font-family);
-  background-color: #0b1120 !important;
+html, body, #app {
+  background-color: var(--bg-page) !important;
   background-image:
-    radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.4), transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(14, 116, 144, 0.4), transparent 50%),
-    radial-gradient(circle at 20% 80%, var(--aurora-1), transparent 55%),
-    radial-gradient(circle at 80% 20%, var(--aurora-2), transparent 50%),
-    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-base) 100%) !important;
+    /* Layer 1: 顶部中央光晕 */
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(94, 106, 210, 0.15) 0%, transparent 50%),
+    /* Layer 2: 左上角紫色极光 */
+    radial-gradient(ellipse 60% 40% at 10% 10%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+    /* Layer 3: 右侧青色极光 */
+    radial-gradient(ellipse 50% 50% at 90% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 40%),
+    /* Layer 4: 底部深色渐变 */
+    linear-gradient(180deg, var(--bg-page) 0%, #020203 100%) !important;
   background-attachment: fixed;
-  color: #f1f5f9 !important;
-  line-height: 1.5;
+  color: var(--text-primary) !important;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
 }
 
-/* ==================== .glass-panel 主玻璃卡片 ==================== */
+body {
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* ==================== 次级文本类 ==================== */
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+/* ==================== 玻璃面板系统 (Linear Style) ==================== */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.6) !important;
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-  border-radius: var(--radius-xl);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 16px;
+  /* 灵魂：1px发光边缘 + 核心阴影 + 环境暗影 */
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 2px 20px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(0, 0, 0, 0.2);
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-panel:hover {
-  background: rgba(15, 23, 42, 0.7) !important;
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  /* 悬浮时：边框变亮，阴影加深，并带出极其微弱的交互色环境光 */
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(94, 106, 210, 0.1);
+  transform: translateY(-2px);
 }
 
-/* ==================== .glass-panel-thin 薄玻璃（小节用）================ */
+/* 薄玻璃面板 */
 .glass-panel-thin {
-  background: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
 }
 
 .glass-panel-thin:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
+  border-color: var(--border-default);
 }
 
-/* ==================== .glass-btn 拟物按钮 ==================== */
+/* ==================== 按钮系统 ==================== */
 .glass-btn {
-  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
-  border: 1px solid rgba(255,255,255,0.2);
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   padding: 10px 20px;
   color: var(--text-primary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
 }
 
 .glass-btn:hover {
-  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
-  border-color: rgba(255,255,255,0.3);
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%);
+  border-color: var(--border-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .glass-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.98);
+  box-shadow: var(--shadow-xs);
 }
 
-/* 按钮文字发光 */
-.btn-glow {
-  text-shadow: 0 2px 10px rgba(255,255,255,0.3);
+/* ============================================
+   主按钮 - 灵魂拟物态 (Linear Style)
+   ============================================ */
+.btn-primary {
+  background-color: #5E6AD2;
+  color: #ffffff;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* 灵魂：外发光 + 内嵌高光（模拟真实立体按键） */
+  box-shadow:
+    0 0 0 1px rgba(94, 106, 210, 0.5),
+    0 4px 12px rgba(94, 106, 210, 0.3),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 }
 
-/* 数字发光 */
-.number-glow {
-  font-weight: 700;
-  text-shadow: 0 2px 10px rgba(255,255,255,0.2);
+.btn-primary:hover {
+  background-color: #6872D9;
+  box-shadow:
+    0 0 0 1px rgba(104, 114, 217, 0.6),
+    0 6px 16px rgba(94, 106, 210, 0.4),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
 }
 
-/* ==================== 滚动条美化 ==================== */
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow:
+    0 0 0 1px rgba(94, 106, 210, 0.5),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 成功按钮 */
+.btn-success {
+  background: var(--gradient-success);
+  border-color: transparent;
+  color: white;
+}
+
+/* 警告按钮 */
+.btn-warning {
+  background: var(--gradient-warning);
+  border-color: transparent;
+  color: #1a1a1a;
+}
+
+/* 危险按钮 */
+.btn-danger {
+  background: var(--gradient-danger);
+  border-color: transparent;
+  color: white;
+}
+
+/* ==================== 卡片系统 ==================== */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-faint);
+  margin-bottom: var(--space-4);
+}
+
+/* ==================== 徽章系统 ==================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.badge-primary {
+  background: var(--primary-subtle);
+  color: var(--primary-hover);
+  border: 1px solid rgba(94, 106, 210, 0.3);
+}
+
+.badge-success {
+  background: var(--success-subtle);
+  color: var(--success);
+  border: 1px solid rgba(77, 175, 115, 0.3);
+}
+
+.badge-warning {
+  background: var(--warning-subtle);
+  color: var(--warning);
+  border: 1px solid rgba(226, 179, 64, 0.3);
+}
+
+.badge-danger {
+  background: var(--danger-subtle);
+  color: var(--danger);
+  border: 1px solid rgba(229, 72, 77, 0.3);
+}
+
+.badge-info {
+  background: var(--info-subtle);
+  color: var(--info);
+  border: 1px solid rgba(94, 156, 230, 0.3);
+}
+
+/* ==================== 输入框系统 ==================== */
+.input {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:hover {
+  border-color: var(--border-hover);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-subtle);
+}
+
+/* ==================== 滚动条系统 ==================== */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -181,36 +362,63 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
-/* Firefox 滚动条 */
+/* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
-/* ==================== 选择文字颜色 ==================== */
+/* ==================== 选择高亮 ==================== */
 ::selection {
-  background: rgba(129, 140, 248, 0.4);
-  color: white;
+  background: var(--primary-subtle);
+  color: var(--text-primary);
 }
 
-/* ==================== Chart.js 样式覆盖 ==================== */
-/* 网格线 */
-canvas + canvas,
-.chart-container canvas {
-  filter: none !important;
+/* ==================== 工具类 ==================== */
+.glow-text {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
-/* 强制图表使用浅色主题 */
+.glow-primary {
+  text-shadow: 0 0 20px rgba(94, 106, 210, 0.5);
+}
+
+.border-glow {
+  box-shadow: 0 0 0 1px rgba(94, 106, 210, 0.3), var(--shadow-glow);
+}
+
+/* 动画关键帧 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ==================== 响应式断点变量 ==================== */
 :root {
-  --chart-grid: rgba(255, 255, 255, 0.05);
-  --chart-tick: rgba(255, 255, 255, 0.5);
-  --chart-legend: rgba(255, 255, 255, 0.7);
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
 }

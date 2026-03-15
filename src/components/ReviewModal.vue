@@ -192,15 +192,15 @@ function handleRestart() {
 .review-modal {
   width: 100%;
   max-width: 500px;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 24px;
+  background: rgba(14, 14, 16, 0.95);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
   padding: 30px;
   position: relative;
   box-shadow:
-    0 0 60px rgba(139, 92, 246, 0.3),
-    0 0 100px rgba(6, 182, 212, 0.2),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(94, 106, 210, 0.15);
   min-height: 400px;
   display: flex;
   flex-direction: column;
@@ -224,21 +224,21 @@ function handleRestart() {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
   font-size: 18px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .close-btn:hover {
-  background: rgba(248, 113, 113, 0.2);
-  border-color: rgba(248, 113, 113, 0.5);
-  color: #f87171;
+  background: var(--danger-subtle);
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 /* 进度条 */
@@ -248,23 +248,23 @@ function handleRestart() {
 
 .progress-bar {
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
   overflow: hidden;
   margin-bottom: 10px;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #06b6d4, #8b5cf6);
-  border-radius: 3px;
+  background: #5E6AD2;
+  border-radius: var(--radius-full);
   transition: width 0.3s ease;
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+  box-shadow: 0 0 10px rgba(94, 106, 210, 0.5);
 }
 
 .progress-text {
   text-align: center;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -281,12 +281,12 @@ function handleRestart() {
 
 .book-label {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   margin-bottom: 15px;
   padding: 4px 16px;
-  background: rgba(139, 92, 246, 0.2);
-  border-radius: 20px;
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: var(--primary-subtle);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(94, 106, 210, 0.3);
 }
 
 .chapter-section {
@@ -296,7 +296,7 @@ function handleRestart() {
 .chapter-name {
   display: block;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
@@ -304,27 +304,26 @@ function handleRestart() {
   display: block;
   font-size: 28px;
   font-weight: 700;
-  color: #f1f5f9;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  color: var(--text-primary);
 }
 
 .due-info {
   font-size: 14px;
   padding: 6px 16px;
-  border-radius: 20px;
+  border-radius: var(--radius-full);
   margin-top: 15px;
 }
 
 .due-info.overdue {
-  background: rgba(248, 113, 113, 0.2);
-  color: #f87171;
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  background: var(--danger-subtle);
+  color: var(--danger);
+  border: 1px solid rgba(229, 72, 77, 0.3);
 }
 
 .due-info.today {
-  background: rgba(251, 191, 36, 0.2);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  background: var(--warning-subtle);
+  color: var(--warning);
+  border: 1px solid rgba(226, 179, 64, 0.3);
 }
 
 /* 打卡按钮 */
@@ -364,36 +363,42 @@ function handleRestart() {
 }
 
 .review-btn.hard {
-  background: linear-gradient(135deg, rgba(248, 113, 113, 0.3), rgba(239, 68, 68, 0.2));
-  border: 1px solid rgba(248, 113, 113, 0.4);
-  box-shadow: 0 4px 20px rgba(248, 113, 113, 0.2);
+  background: var(--danger-subtle);
+  border: 1px solid rgba(229, 72, 77, 0.4);
+  box-shadow: 0 4px 20px rgba(229, 72, 77, 0.15);
+  color: var(--danger);
 }
 
 .review-btn.hard:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(248, 113, 113, 0.4);
+  box-shadow: 0 8px 30px rgba(229, 72, 77, 0.25);
+  background: rgba(229, 72, 77, 0.2);
 }
 
 .review-btn.normal {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.2));
-  border: 1px solid rgba(251, 191, 36, 0.4);
-  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.2);
+  background: var(--warning-subtle);
+  border: 1px solid rgba(226, 179, 64, 0.4);
+  box-shadow: 0 4px 20px rgba(226, 179, 64, 0.15);
+  color: var(--warning);
 }
 
 .review-btn.normal:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(251, 191, 36, 0.4);
+  box-shadow: 0 8px 30px rgba(226, 179, 64, 0.25);
+  background: rgba(226, 179, 64, 0.2);
 }
 
 .review-btn.easy {
-  background: linear-gradient(135deg, rgba(52, 211, 153, 0.3), rgba(16, 185, 129, 0.2));
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  box-shadow: 0 4px 20px rgba(52, 211, 153, 0.2);
+  background: var(--success-subtle);
+  border: 1px solid rgba(77, 175, 115, 0.4);
+  box-shadow: 0 4px 20px rgba(77, 175, 115, 0.15);
+  color: var(--success);
 }
 
 .review-btn.easy:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(52, 211, 153, 0.4);
+  box-shadow: 0 8px 30px rgba(77, 175, 115, 0.25);
+  background: rgba(77, 175, 115, 0.2);
 }
 
 .review-btn:active {
@@ -407,12 +412,12 @@ function handleRestart() {
 .btn-text {
   font-size: 16px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .btn-hint {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
 }
 
 /* 完成画面 */
@@ -440,31 +445,32 @@ function handleRestart() {
 .celebration-title {
   font-size: 24px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text-primary);
   margin-bottom: 10px;
 }
 
 .celebration-subtitle {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   margin-bottom: 30px;
 }
 
 .restart-btn {
   padding: 12px 30px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(99, 102, 241, 0.2));
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  border-radius: 12px;
-  color: #f1f5f9;
+  background: var(--primary-subtle);
+  border: 1px solid rgba(94, 106, 210, 0.4);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
 }
 
 .restart-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+  background: rgba(94, 106, 210, 0.2);
+  box-shadow: 0 8px 25px rgba(94, 106, 210, 0.2);
 }
 
 /* 空队列画面 */
@@ -486,13 +492,13 @@ function handleRestart() {
 .empty-title {
   font-size: 24px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
   margin-bottom: 10px;
 }
 
 .empty-subtitle {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
 }
 
 /* 底部操作区 */
@@ -505,20 +511,26 @@ function handleRestart() {
 
 .done-btn {
   padding: 14px 40px;
-  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  background: #5E6AD2;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   color: white;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+  transition: all var(--transition-normal);
+  box-shadow:
+    0 0 0 1px rgba(94, 106, 210, 0.5),
+    0 4px 12px rgba(94, 106, 210, 0.3),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 }
 
 .done-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(104, 114, 217, 0.6),
+    0 6px 16px rgba(94, 106, 210, 0.4),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
 }
 
 /* Transition */

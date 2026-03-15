@@ -128,8 +128,8 @@ defineExpose({
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
   justify-content: center;
@@ -137,17 +137,18 @@ defineExpose({
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(14, 14, 16, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   padding: 30px;
   max-width: 450px;
   width: 90%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(94, 106, 210, 0.1);
 }
 
 .modal-icon {
@@ -187,13 +188,13 @@ defineExpose({
 .form-group input {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   font-size: 14px;
   margin-top: 8px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-elevated);
   color: var(--text-primary);
-  transition: all 0.3s ease;
+  transition: all var(--transition-fast);
 }
 
 .form-group input::placeholder {
@@ -203,12 +204,12 @@ defineExpose({
 .form-group input:focus {
   outline: none;
   border-color: var(--primary);
-  background: rgba(0, 0, 0, 0.3);
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 3px var(--primary-subtle);
 }
 
 .form-group input:disabled {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--bg-surface);
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -227,15 +228,15 @@ defineExpose({
 }
 
 .test-result.success {
-  background: rgba(52, 211, 153, 0.15);
-  color: var(--success-light);
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  background: var(--success-subtle);
+  color: var(--success);
+  border: 1px solid rgba(77, 175, 115, 0.3);
 }
 
 .test-result.error {
-  background: rgba(248, 113, 113, 0.15);
-  color: var(--danger-light);
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  background: var(--danger-subtle);
+  color: var(--danger);
+  border: 1px solid rgba(229, 72, 77, 0.3);
 }
 
 .modal-buttons {
@@ -261,28 +262,15 @@ defineExpose({
   cursor: not-allowed;
 }
 
-.btn-primary {
-  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: var(--primary-light);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active:not(:disabled) {
-  transform: scale(0.96);
-}
-
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-default);
   color: var(--text-secondary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
 }
 </style>

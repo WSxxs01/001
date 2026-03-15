@@ -119,8 +119,8 @@ defineExpose({
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
   justify-content: center;
@@ -133,21 +133,22 @@ defineExpose({
   to { opacity: 1; }
 }
 
-/* 弹窗主体 - 玻璃拟物 */
+/* 弹窗主体 - Linear 玻璃拟物 */
 .modal-content {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(14, 14, 16, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   padding: 30px;
   max-width: 480px;
   width: 90%;
   text-align: center;
   animation: modalIn 0.3s ease;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 8px 40px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(94, 106, 210, 0.1);
 }
 
 @keyframes modalIn {
@@ -190,12 +191,12 @@ defineExpose({
 .form-group textarea {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: all var(--transition-fast);
   font-family: inherit;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-elevated);
   color: var(--text-primary);
 }
 
@@ -208,8 +209,8 @@ defineExpose({
 .form-group textarea:focus {
   outline: none;
   border-color: var(--primary);
-  background: rgba(0, 0, 0, 0.3);
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 3px var(--primary-subtle);
 }
 
 .form-group textarea {
@@ -235,33 +236,17 @@ defineExpose({
   transition: all 0.3s ease;
 }
 
-.btn-primary {
-  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: var(--primary-light);
-  backdrop-filter: blur(10px);
-}
-
-.btn-primary:hover {
-  transform: scale(1.02);
-  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
-  box-shadow: 0 6px 20px rgba(129, 140, 248, 0.3);
-  border-color: rgba(255,255,255,0.35);
-}
-
-.btn-primary:active {
-  transform: scale(0.96);
-}
-
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-default);
   color: var(--text-secondary);
+  transition: all var(--transition-normal);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
 }
 
 @media (max-width: 480px) {

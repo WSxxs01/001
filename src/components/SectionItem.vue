@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useStudyStore } from '../stores/useStudyStore'
-import { getSectionStatus, getToday } from '../utils/sm2'
 
 const props = defineProps({
   sectionKey: {
@@ -54,15 +53,15 @@ const statusTag = computed(() => {
 const buttonConfig = computed(() => {
   switch (status.value) {
     case 'unstarted':
-      return { text: '开始学习', class: 'btn-learn', action: 'learn' }
+      return { text: '开始学习', class: 'btn-primary', action: 'learn' }
     case 'learning':
     case 'today':
     case 'overdue':
-      return { text: '复习', class: 'btn-review', action: 'review' }
+      return { text: '复习', class: 'btn-warning', action: 'review' }
     case 'completed':
-      return { text: '已完成', class: 'btn-done', action: 'done' }
+      return { text: '已完成', class: 'btn-ghost', action: 'done' }
     default:
-      return { text: '开始学习', class: 'btn-learn', action: 'learn' }
+      return { text: '开始学习', class: 'btn-primary', action: 'learn' }
   }
 })
 
@@ -70,19 +69,13 @@ const buttonConfig = computed(() => {
 function handleClick() {
   if (buttonConfig.value.action === 'done') return
 
-  // 调用 store 方法
   store.submitReview(props.sectionKey, 'normal')
-
-  // 触发闪烁动画
   triggerFlash()
-
-  // 通知父组件
   emit('reviewSubmitted')
 }
 
 // 移动端触摸处理
 function handleTouchEnd(e) {
-  // 防止触摸触发两次点击事件
   e.preventDefault()
   e.stopPropagation()
   handleClick()
@@ -111,29 +104,35 @@ function handleDelete(e) {
     class="section-item"
     :class="{ 'completed-flash': isFlashing }"
   >
-    <div class="section-name">
-      <span class="mastery-indicator" :class="`mastery-${status === 'completed' ? (store.getSectionData(sectionKey)?.masteryLevel || 'learning') : 'learning'}`"></span>
-      {{ sectionName }}
+    <div class="section-main">
+      <span class="status-dot" :class="status"></span>
+      <span class="section-name">{{ sectionName }}</span>
     </div>
-    <button
-      class="section-delete-btn"
-      title="删除"
-      @click="handleDelete"
-    >
-      🗑️
-    </button>
-    <div class="section-right">
-      <span class="section-status-tag" :class="statusTag.class">
+
+    <div class="section-actions">
+      <span class="status-tag" :class="statusTag.class">
         {{ statusTag.text }}
       </span>
+
       <button
-        class="section-btn"
+        class="action-btn delete-btn"
+        title="删除小节"
+        aria-label="删除小节"
+        @click="handleDelete"
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path d="M2 4H14M12 4V13C12 13.5523 11.5523 14 11 14H5C4.44772 14 4 13.5523 4 13V4M6 4V3C6 2.44772 6.44772 2 7 2H9C9.55228 2 10 2.44772 10 3V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <button
+        class="action-btn"
         :class="buttonConfig.class"
         :disabled="buttonConfig.action === 'done'"
         @click="handleClick"
         @touchend.prevent="handleTouchEnd"
       >
-        <span class="btn-text">{{ buttonConfig.text }}</span>
+        {{ buttonConfig.text }}
       </button>
     </div>
   </div>
@@ -144,10 +143,10 @@ function handleDelete(e) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 15px 12px 25px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.2s ease;
-  background: rgba(0, 0, 0, 0.15);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-faint);
+  transition: all var(--transition-fast);
+  gap: 12px;
 }
 
 .section-item:last-child {
@@ -155,8 +154,7 @@ function handleDelete(e) {
 }
 
 .section-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
 }
 
 .section-item.completed-flash {
@@ -164,9 +162,54 @@ function handleDelete(e) {
 }
 
 @keyframes completeFlash {
-  0% { background: rgba(52, 211, 153, 0.3); }
-  50% { background: rgba(52, 211, 153, 0.2); }
-  100% { background: rgba(0, 0, 0, 0.15); }
+  0% { background: var(--success-subtle); }
+  50% { background: rgba(77, 175, 115, 0.15); }
+  100% { background: transparent; }
+}
+
+.section-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.status-dot.unstarted {
+  background: var(--text-muted);
+}
+
+.status-dot.learning {
+  background: var(--info);
+  box-shadow: 0 0 6px rgba(94, 156, 230, 0.5);
+}
+
+.status-dot.today {
+  background: var(--warning);
+  box-shadow: 0 0 6px rgba(226, 179, 64, 0.5);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-dot.overdue {
+  background: var(--danger);
+  box-shadow: 0 0 6px rgba(229, 72, 77, 0.5);
+}
+
+.status-dot.completed {
+  background: var(--success);
+  box-shadow: 0 0 6px rgba(77, 175, 115, 0.5);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 .section-name {
@@ -177,124 +220,135 @@ function handleDelete(e) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: flex;
-  align-items: center;
 }
 
-.mastery-indicator {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 8px;
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-.mastery-learning { background: var(--info); box-shadow: 0 0 6px rgba(56, 189, 248, 0.5); }
-.mastery-stable { background: var(--success); box-shadow: 0 0 6px rgba(52, 211, 153, 0.5); }
-.mastery-mastered { background: var(--success-light); box-shadow: 0 0 8px rgba(110, 231, 183, 0.6); }
-.mastery-weak { background: var(--danger); box-shadow: 0 0 6px rgba(248, 113, 113, 0.5); }
-
-.section-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.section-status-tag {
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
+.status-tag {
   font-size: 11px;
   font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
 }
 
-.tag-unstarted { background: var(--glass-bg); color: var(--text-muted); }
-.tag-learning { background: rgba(56, 189, 248, 0.15); color: var(--info); }
-.tag-today { background: rgba(251, 191, 36, 0.15); color: var(--warning); animation: glow 1.5s infinite; }
-.tag-overdue { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
-.tag-stable { background: rgba(52, 211, 153, 0.15); color: var(--success); }
-.tag-mastered { background: rgba(52, 211, 153, 0.2); color: var(--success-light); }
-.tag-weak { background: rgba(248, 113, 113, 0.2); color: var(--danger-light); }
-
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 3px rgba(251, 191, 36, 0.3); }
-  50% { box-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
+.tag-unstarted {
+  background: var(--bg-hover);
+  color: var(--text-muted);
 }
 
-.section-btn {
+.tag-learning {
+  background: var(--info-subtle);
+  color: var(--info);
+}
+
+.tag-today {
+  background: var(--warning-subtle);
+  color: var(--warning);
+}
+
+.tag-overdue {
+  background: var(--danger-subtle);
+  color: var(--danger);
+}
+
+.tag-stable {
+  background: var(--success-subtle);
+  color: var(--success);
+}
+
+.tag-mastered {
+  background: rgba(77, 175, 115, 0.2);
+  color: #5EE4A0;
+}
+
+.tag-weak {
+  background: rgba(229, 72, 77, 0.2);
+  color: #FF7A7E;
+}
+
+.action-btn {
   padding: 6px 14px;
-  border: none;
   border-radius: var(--radius-md);
-  cursor: pointer;
   font-size: 12px;
   font-weight: 500;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  user-select: none;
-  position: relative;
-  overflow: hidden;
+  white-space: nowrap;
 }
 
-.section-btn .btn-text {
-  pointer-events: none;
-  display: inline-block;
-}
-
-.section-btn.btn-learn {
-  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 100%);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: var(--primary-light);
-  backdrop-filter: blur(10px);
-}
-
-.section-btn.btn-review {
-  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 100%);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: var(--chart-orange);
-  backdrop-filter: blur(10px);
-}
-
-.section-btn.btn-done {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-muted);
+.action-btn:disabled {
   cursor: not-allowed;
-  border: 1px solid rgba(255,255,255,0.05);
 }
 
-.section-btn:hover:not(.btn-done) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 100%);
+.btn-warning {
+  background: var(--warning);
+  color: #1a1a1a;
 }
 
-.section-btn:active:not(.btn-done) {
-  transform: scale(0.96);
+.btn-warning:hover:not(:disabled) {
+  background: #EEC050;
+  box-shadow: 0 0 12px rgba(226, 179, 64, 0.4);
 }
 
-.section-delete-btn {
+.btn-ghost {
   background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-default);
+}
+
+.delete-btn {
+  padding: 6px;
+  background: transparent;
+  color: var(--text-muted);
   border: none;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
   opacity: 0;
-  transition: all 0.2s ease;
-  margin-right: 8px;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.section-item:hover .section-delete-btn {
-  opacity: 0.5;
+.section-item:hover .delete-btn {
+  opacity: 0.6;
 }
 
-.section-delete-btn:hover {
-  background: rgba(248, 113, 113, 0.2);
+.delete-btn:hover {
+  background: var(--danger-subtle);
   color: var(--danger);
   opacity: 1;
-  transform: scale(1.1);
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+  .section-item {
+    padding: 10px 12px;
+  }
+
+  .status-tag {
+    display: none;
+  }
+
+  .delete-btn {
+    opacity: 0.6;
+  }
+}
+
+/* 移动端触摸优化 */
+@media (pointer: coarse) {
+  .section-item:hover {
+    background: transparent;
+  }
+
+  .delete-btn {
+    opacity: 0.6;
+  }
 }
 </style>
