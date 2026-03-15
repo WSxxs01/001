@@ -15,13 +15,34 @@ function onReviewSubmitted() {
 // 展开的章节索引
 const expandedChapters = ref([])
 
+// 触摸移动检测变量
+let touchStartY = 0
+let hasMoved = false
+
 // 切换章节展开/收起
 function toggleChapter(index) {
+  // 如果触摸过程中有显著移动，则不触发展开/收起
+  if (hasMoved) return
+
   const idx = expandedChapters.value.indexOf(index)
   if (idx === -1) {
     expandedChapters.value.push(index)
   } else {
     expandedChapters.value.splice(idx, 1)
+  }
+}
+
+// 触摸开始
+function handleTouchStart(e) {
+  touchStartY = e.touches[0].clientY
+  hasMoved = false
+}
+
+// 触摸移动 - 检测是否在滚动
+function handleTouchMove(e) {
+  const touchY = e.touches[0].clientY
+  if (Math.abs(touchY - touchStartY) > 10) {
+    hasMoved = true
   }
 }
 
@@ -76,7 +97,7 @@ function deleteChapter(chapterIndex) {
         { expanded: expandedChapters.includes(chapterIndex) }
       ]"
     >
-      <div class="chapter-header" @click="toggleChapter(chapterIndex)" @touchend.prevent="toggleChapter(chapterIndex)">
+      <div class="chapter-header" @click="toggleChapter(chapterIndex)" @touchstart="handleTouchStart" @touchmove="handleTouchMove">
         <div class="chapter-header-left">
           <div class="chapter-expand-icon">▶</div>
           <span class="chapter-name">{{ chapter.name }}</span>
