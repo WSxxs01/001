@@ -128,7 +128,8 @@ defineExpose({
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
   z-index: 1000;
   display: flex;
   justify-content: center;
@@ -136,11 +137,17 @@ defineExpose({
 }
 
 .modal-content {
-  background: white;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-xl);
   padding: 30px;
   max-width: 450px;
   width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .modal-icon {
@@ -153,7 +160,8 @@ defineExpose({
   font-size: 22px;
   text-align: center;
   margin-bottom: 20px;
-  color: #333;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .form-group {
@@ -166,55 +174,68 @@ defineExpose({
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #333;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .form-group label input[type="checkbox"] {
   width: 18px;
   height: 18px;
+  accent-color: var(--primary);
 }
 
 .form-group input {
   width: 100%;
   padding: 12px 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
   font-size: 14px;
   margin-top: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.form-group input::placeholder {
+  color: var(--text-muted);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--primary);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
 }
 
 .form-group input:disabled {
-  background: #f5f5f5;
+  background: rgba(0, 0, 0, 0.1);
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .hint {
   font-size: 12px;
-  color: #999;
+  color: var(--text-muted);
   margin-top: 5px;
 }
 
 .test-result {
   padding: 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   margin-bottom: 15px;
 }
 
 .test-result.success {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--success-light);
+  border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .test-result.error {
-  background: #ffebee;
-  color: #c62828;
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--danger-light);
+  border: 1px solid rgba(248, 113, 113, 0.3);
 }
 
 .modal-buttons {
@@ -222,15 +243,17 @@ defineExpose({
   gap: 10px;
   justify-content: center;
   flex-wrap: wrap;
+  margin-top: 20px;
 }
 
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .btn:disabled {
@@ -239,12 +262,27 @@ defineExpose({
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--primary-light);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .btn-secondary {
-  background: #f5f5f5;
-  color: #666;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
 }
 </style>

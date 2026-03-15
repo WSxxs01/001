@@ -204,11 +204,21 @@ const totalStats = computed(() => {
 
 <style scoped>
 .heatmap-card {
-  background: white;
-  border-radius: 16px;
+  /* 应用 .glass-panel 样式 */
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.heatmap-card:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .heatmap-header {
@@ -221,19 +231,20 @@ const totalStats = computed(() => {
 }
 
 .heatmap-header h3 {
-  color: #333;
+  color: var(--text-primary);
   font-size: 16px;
   margin: 0;
+  font-weight: 500;
 }
 
 .heatmap-stats {
   font-size: 13px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .heatmap-stats .separator {
   margin: 0 8px;
-  color: #ddd;
+  color: var(--text-muted);
 }
 
 .heatmap-container {
@@ -250,7 +261,7 @@ const totalStats = computed(() => {
 
 .month-label {
   font-size: 11px;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .heatmap-body {
@@ -267,7 +278,7 @@ const totalStats = computed(() => {
 .day-label {
   height: 12px;
   font-size: 10px;
-  color: #999;
+  color: var(--text-muted);
   line-height: 12px;
   width: 24px;
   text-align: right;
@@ -287,30 +298,33 @@ const totalStats = computed(() => {
 .day-cell {
   width: 12px;
   height: 12px;
-  border-radius: 2px;
-  background: #ebedf0;
-  transition: transform 0.1s;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.1s ease;
 }
 
 .day-cell:hover {
   transform: scale(1.3);
-  outline: 2px solid #667eea;
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
 }
 
-.day-cell.level-0 { background: #ebedf0; }
-.day-cell.level-1 { background: #c3b3ea; }
-.day-cell.level-2 { background: #9f81df; }
-.day-cell.level-3 { background: #764ba2; }
-.day-cell.level-4 { background: #5a3b8c; }
+/* 热力图颜色 - 荧光色系 */
+.day-cell.level-0 { background: rgba(255, 255, 255, 0.08); }
+.day-cell.level-1 { background: rgba(56, 189, 248, 0.6); box-shadow: 0 0 4px rgba(56, 189, 248, 0.3); }
+.day-cell.level-2 { background: rgba(139, 92, 246, 0.7); box-shadow: 0 0 4px rgba(139, 92, 246, 0.4); }
+.day-cell.level-3 { background: rgba(168, 85, 247, 0.8); box-shadow: 0 0 6px rgba(168, 85, 247, 0.5); }
+.day-cell.level-4 { background: rgba(236, 72, 153, 0.9); box-shadow: 0 0 8px rgba(236, 72, 153, 0.6); }
 
 .day-cell.is-today {
-  outline: 2px solid #667eea;
+  outline: 2px solid var(--primary);
   outline-offset: 1px;
 }
 
 .day-cell.is-future {
   background: transparent;
-  border: 1px dashed #eee;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
 }
 
 .heatmap-legend {
@@ -323,7 +337,7 @@ const totalStats = computed(() => {
 
 .legend-label {
   font-size: 11px;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .legend-cells {
@@ -334,14 +348,14 @@ const totalStats = computed(() => {
 .legend-cell {
   width: 12px;
   height: 12px;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
-.legend-cell.level-0 { background: #ebedf0; }
-.legend-cell.level-1 { background: #c3b3ea; }
-.legend-cell.level-2 { background: #9f81df; }
-.legend-cell.level-3 { background: #764ba2; }
-.legend-cell.level-4 { background: #5a3b8c; }
+.legend-cell.level-0 { background: rgba(255, 255, 255, 0.08); }
+.legend-cell.level-1 { background: rgba(56, 189, 248, 0.6); }
+.legend-cell.level-2 { background: rgba(139, 92, 246, 0.7); }
+.legend-cell.level-3 { background: rgba(168, 85, 247, 0.8); }
+.legend-cell.level-4 { background: rgba(236, 72, 153, 0.9); }
 
 @media (max-width: 768px) {
   .heatmap-header {

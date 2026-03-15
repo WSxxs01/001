@@ -14,12 +14,11 @@
   --aurora-3: rgba(80, 60, 180, 0.15);
 
   /* ==================== 玻璃拟物化 ==================== */
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-bg-hover: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-bg-hover: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-hover: rgba(255, 255, 255, 0.15);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --glass-blur: blur(12px);
+  --glass-blur: blur(24px) saturate(180%);
 
   /* ==================== 卡片颜色 ==================== */
   --card-bg: rgba(20, 25, 40, 0.7);
@@ -46,18 +45,26 @@
 
   --info: #38bdf8;
 
+  /* 荧光色图表 */
+  --chart-blue: #3b82f6;
+  --chart-purple: #8b5cf6;
+  --chart-cyan: #06b6d4;
+  --chart-orange: #f97316;
+  --chart-pink: #ec4899;
+
   /* ==================== 渐变色 ==================== */
   --gradient-primary: linear-gradient(135deg, #818cf8, #6366f1);
   --gradient-success: linear-gradient(135deg, #34d399, #10b981);
   --gradient-warning: linear-gradient(135deg, #fbbf24, #f59e0b);
   --gradient-danger: linear-gradient(135deg, #f87171, #ef4444);
   --gradient-bg: linear-gradient(135deg, #1e293b, #0f172a);
+  --gradient-chart: linear-gradient(90deg, #3b82f6, #8b5cf6);
 
   /* ==================== 间距 & 圆角 ==================== */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-xl: 20px;
 
   --space-xs: 4px;
   --space-sm: 8px;
@@ -96,51 +103,76 @@ body {
   line-height: 1.5;
 }
 
-/* 玻璃卡片基础样式 */
-.glass-card {
-  background: var(--card-bg);
+/* ==================== .glass-panel 主玻璃卡片 ==================== */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--glass-shadow);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-xl);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
-.glass-card:hover {
-  border-color: var(--glass-border-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+.glass-panel:hover {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* 按钮基础样式 */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-sm) var(--space-lg);
-  border: none;
+/* ==================== .glass-panel-thin 薄玻璃（小节用）================ */
+.glass-panel-thin {
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-md);
-  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.glass-panel-thin:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== .glass-btn 拟物按钮 ==================== */
+.glass-btn {
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  color: var(--text-primary);
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: var(--glass-bg);
-  color: var(--text-primary);
-  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.btn:hover {
-  background: var(--glass-bg-hover);
-  border-color: var(--glass-border-hover);
+.glass-btn:hover {
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+  border-color: rgba(255,255,255,0.3);
   transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.btn:active {
-  transform: translateY(0);
+.glass-btn:active {
+  transform: scale(0.96);
 }
 
-/* 滚动条美化 */
+/* 按钮文字发光 */
+.btn-glow {
+  text-shadow: 0 2px 10px rgba(255,255,255,0.3);
+}
+
+/* 数字发光 */
+.number-glow {
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(255,255,255,0.2);
+}
+
+/* ==================== 滚动条美化 ==================== */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -151,16 +183,36 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
 }
 
-/* 选择文字颜色 */
+/* Firefox 滚动条 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* ==================== 选择文字颜色 ==================== */
 ::selection {
   background: rgba(129, 140, 248, 0.4);
   color: white;
+}
+
+/* ==================== Chart.js 样式覆盖 ==================== */
+/* 网格线 */
+canvas + canvas,
+.chart-container canvas {
+  filter: none !important;
+}
+
+/* 强制图表使用浅色主题 */
+:root {
+  --chart-grid: rgba(255, 255, 255, 0.05);
+  --chart-tick: rgba(255, 255, 255, 0.5);
+  --chart-legend: rgba(255, 255, 255, 0.7);
 }

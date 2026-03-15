@@ -119,7 +119,8 @@ defineExpose({
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
   z-index: 1000;
   display: flex;
   justify-content: center;
@@ -132,14 +133,21 @@ defineExpose({
   to { opacity: 1; }
 }
 
+/* 弹窗主体 - 玻璃拟物 */
 .modal-content {
-  background: white;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-xl);
   padding: 30px;
   max-width: 480px;
   width: 90%;
   text-align: center;
   animation: modalIn 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 @keyframes modalIn {
@@ -155,7 +163,8 @@ defineExpose({
 .modal-title {
   font-size: 22px;
   margin-bottom: 20px;
-  color: #333;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .form-group {
@@ -166,14 +175,14 @@ defineExpose({
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #333;
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
 }
 
 .format-hint {
   font-size: 12px;
-  color: #999;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
@@ -181,17 +190,26 @@ defineExpose({
 .form-group textarea {
   width: 100%;
   padding: 12px 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
   font-size: 14px;
-  transition: border-color 0.3s;
+  transition: all 0.3s ease;
   font-family: inherit;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-muted);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--primary);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
 }
 
 .form-group textarea {
@@ -210,30 +228,40 @@ defineExpose({
 .btn {
   padding: 12px 28px;
   border: none;
-  border-radius: 25px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--primary-light);
+  backdrop-filter: blur(10px);
 }
 
 .btn-primary:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+  transform: scale(1.02);
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+  box-shadow: 0 6px 20px rgba(129, 140, 248, 0.3);
+  border-color: rgba(255,255,255,0.35);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
 }
 
 .btn-secondary {
-  background: #e0e0e0;
-  color: #666;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
 }
 
 .btn-secondary:hover {
-  background: #d0d0d0;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 @media (max-width: 480px) {

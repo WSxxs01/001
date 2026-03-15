@@ -169,7 +169,6 @@ export const useStudyStore = defineStore('study', () => {
     const config = getSyncConfig()
     if (config.enabled) {
       syncEnabled.value = true
-      console.log('🔄 检测到云同步已启用，正在下载数据...')
 
       try {
         const result = await downloadData()
@@ -184,7 +183,6 @@ export const useStudyStore = defineStore('study', () => {
             localStorage.setItem(BOOKS_KEY, JSON.stringify(books.value))
           }
           lastSyncTime.value = result.data.timestamp
-          console.log('✅ 云端数据已同步')
         }
       } catch (e) {
         console.error('初始同步失败:', e)
@@ -297,11 +295,7 @@ export const useStudyStore = defineStore('study', () => {
   // 提交复习反馈
   function submitReview(sectionKey, feedback) {
     try {
-      // 第一重保护：打印日志
-      console.log('正在打卡的小节：', sectionKey, feedback)
-
       const data = studyData.value[sectionKey]
-      console.log('当前数据：', data)
 
       // 如果未学习，先初始化学习数据（首次学习）
       if (!data || !data.learned) {
@@ -320,10 +314,8 @@ export const useStudyStore = defineStore('study', () => {
         // 首次学习使用 Good (normal) 评级
         const initialResult = handleFirstLearn()
 
-        // 第二重保护：确保 card 存在
         let cardData = initialResult?.card
         if (!cardData) {
-          console.warn('card 不存在，使用空对象')
           cardData = {}
         }
 
@@ -350,7 +342,6 @@ export const useStudyStore = defineStore('study', () => {
         }
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
-        console.log('首次学习完成：', studyData.value[sectionKey])
         return studyData.value[sectionKey]
       }
 
@@ -358,22 +349,15 @@ export const useStudyStore = defineStore('study', () => {
       // 保存历史状态（用于撤销）
       pushHistory(sectionKey, data)
 
-      console.log('[DEBUG] 复习数据:', JSON.stringify(data))
-      console.log('[DEBUG] fsrsCard:', data.fsrsCard)
-      console.log('[DEBUG] fsrsCard.state:', data.fsrsCard?.state)
-
       const fsrsResult = scheduleNextReview(data, feedback)
 
-      // 第三重保护：检查 FSRS 结果
       if (!fsrsResult) {
-        console.error('FSRS 计算结果为空')
         alert('打卡失败，请查看控制台')
         return data
       }
 
       let cardData = fsrsResult?.fsrsCard
       if (!cardData) {
-        console.warn('fsrsCard 不存在，使用空对象')
         cardData = {}
       }
 
@@ -395,11 +379,10 @@ export const useStudyStore = defineStore('study', () => {
       }
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
-      console.log('复习完成：', studyData.value[sectionKey])
       return studyData.value[sectionKey]
 
     } catch (error) {
-      console.error('打卡逻辑崩溃：', error)
+      console.error('打卡失败：', error)
       const errMsg = '打卡失败: ' + error.message
       // 移动端友好提示
       if (typeof window !== 'undefined' && window.alert) {
@@ -466,7 +449,6 @@ export const useStudyStore = defineStore('study', () => {
     // 立即保存到本地存储
     localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
 
-    console.log('已删除小节：', sectionKey)
     return true
   }
 

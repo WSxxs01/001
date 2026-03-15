@@ -104,7 +104,7 @@ function deleteChapter(chapterIndex) {
           <span v-if="getChapterProgress(chapter, chapterIndex).status === 'overdue'" class="chapter-alert-badge">
             逾期
           </span>
-          <span v-else-if="getChapterProgress(chapter, chapterIndex).status === 'today-review'" class="chapter-alert-badge" style="background:#ff9800">
+          <span v-else-if="getChapterProgress(chapter, chapterIndex).status === 'today-review'" class="chapter-alert-badge" style="background:var(--warning)">
             待复习
           </span>
         </div>
@@ -152,33 +152,39 @@ function deleteChapter(chapterIndex) {
   gap: 12px;
 }
 
+/* 章节容器 - 应用 glass-panel */
 .chapter-accordion {
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   transition: all 0.3s ease;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
 .chapter-accordion:hover {
-  border-color: var(--glass-border-hover);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
 }
 
 .chapter-accordion.learned {
-  background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(52, 211, 153, 0.05));
-  border-color: rgba(52, 211, 153, 0.3);
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.08), rgba(52, 211, 153, 0.03));
+  border-color: rgba(52, 211, 153, 0.2);
 }
 
 .chapter-accordion.today-review {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
-  border-color: rgba(251, 191, 36, 0.3);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.03));
+  border-color: rgba(251, 191, 36, 0.2);
 }
 
 .chapter-accordion.overdue {
-  background: linear-gradient(135deg, rgba(248, 113, 113, 0.1), rgba(239, 68, 68, 0.05));
-  border-color: rgba(248, 113, 113, 0.3);
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.08), rgba(239, 68, 68, 0.03));
+  border-color: rgba(248, 113, 113, 0.2);
 }
 
 .chapter-header {

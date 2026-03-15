@@ -18,9 +18,6 @@ function getReviewStatsForNext7Days() {
   const today = getToday()
   const stats = []
 
-  console.log('[DEBUG] today:', today)
-  console.log('[DEBUG] studyData:', store.studyData)
-
   for (let i = 0; i < 7; i++) {
     const date = new Date(today)
     date.setDate(date.getDate() + i)
@@ -37,11 +34,9 @@ function getReviewStatsForNext7Days() {
       // FSRS 算法：使用 due 字段判断复习日期
       if (data.fsrsCard && data.due) {
         const dueDate = data.due
-        console.log(`[DEBUG] dueDate: ${dueDate}, today: ${today}, compare: ${dueDate < today}, ${dueDate === today}`)
 
         if (dueDate < today) {
           // 已逾期
-          console.log('[DEBUG] 逾期:', data)
           if (i === 0) overdue++
         } else if (dueDate === today) {
           // 今天是复习日
@@ -75,7 +70,6 @@ function getReviewStatsForNext7Days() {
     stats.push({ date: dateStr, completed, todayReview, overdue, pending, label: `第${i + 1}天` })
   }
 
-  console.log('[DEBUG] stats:', stats)
   return stats
 }
 
@@ -109,14 +103,15 @@ function renderMemoryChart() {
       datasets: [{
         label: '记忆保持率',
         data: [100, 80, 70, 60, 55, 50, 40],
-        borderColor: '#667eea',
-        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+        borderColor: '#8b5cf6',
+        backgroundColor: 'rgba(139, 92, 246, 0.15)',
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#667eea',
-        pointBorderColor: '#fff',
+        pointBackgroundColor: '#8b5cf6',
+        pointBorderColor: 'rgba(255,255,255,0.8)',
         pointBorderWidth: 2,
-        pointRadius: 5
+        pointRadius: 5,
+        pointHoverRadius: 7
       }]
     },
     options: {
@@ -125,14 +120,33 @@ function renderMemoryChart() {
       plugins: {
         legend: {
           display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1
         }
       },
       scales: {
+        x: {
+          grid: {
+            color: 'rgba(255, 255, 255, 0.05)'
+          },
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.5)'
+          }
+        },
         y: {
           beginAtZero: true,
           max: 100,
+          grid: {
+            color: 'rgba(255, 255, 255, 0.05)'
+          },
           ticks: {
-            callback: value => value + '%'
+            callback: value => value + '%',
+            color: 'rgba(255, 255, 255, 0.5)'
           }
         }
       }
@@ -163,19 +177,25 @@ function renderReviewChart() {
         {
           label: '今日/逾期',
           data: todayData,
-          backgroundColor: '#f44336',
+          backgroundColor: 'rgba(248, 113, 113, 0.8)',
+          borderColor: '#f87171',
+          borderWidth: 0,
           borderRadius: 4
         },
         {
           label: '待复习',
           data: pendingData,
-          backgroundColor: '#ff9800',
+          backgroundColor: 'rgba(251, 191, 36, 0.8)',
+          borderColor: '#fbbf24',
+          borderWidth: 0,
           borderRadius: 4
         },
         {
           label: '已完成',
           data: completedData,
-          backgroundColor: '#4caf50',
+          backgroundColor: 'rgba(52, 211, 153, 0.8)',
+          borderColor: '#34d399',
+          borderWidth: 0,
           borderRadius: 4
         }
       ]
@@ -188,8 +208,16 @@ function renderReviewChart() {
           position: 'top',
           labels: {
             usePointStyle: true,
-            padding: 20
+            padding: 20,
+            color: 'rgba(255, 255, 255, 0.7)'
           }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1
         }
       },
       scales: {
@@ -197,13 +225,20 @@ function renderReviewChart() {
           stacked: true,
           grid: {
             display: false
+          },
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.5)'
           }
         },
         y: {
           stacked: true,
           beginAtZero: true,
+          grid: {
+            color: 'rgba(255, 255, 255, 0.05)'
+          },
           ticks: {
-            stepSize: 1
+            stepSize: 1,
+            color: 'rgba(255, 255, 255, 0.5)'
           }
         }
       }
@@ -223,7 +258,6 @@ function initCharts() {
 watch(
   () => store.studyData,
   () => {
-    console.log('[WATCH] studyData 变化，重新渲染图表')
     renderReviewChart()
   },
   { deep: true }
@@ -284,12 +318,20 @@ onMounted(async () => {
 }
 
 .chart-card {
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
+  /* 应用 .glass-panel 样式 */
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
   padding: 20px;
-  box-shadow: var(--glass-shadow);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.chart-card:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .chart-card h3 {

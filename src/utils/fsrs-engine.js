@@ -161,8 +161,6 @@ export function scheduleNextReview(currentData, feedback) {
     // 新的重复次数
     const repetitions = (currentData?.repetitions || 0) + 1
 
-    console.log('[间隔算法] interval:', interval, '->', newInterval, 'difficulty:', difficulty)
-
     return {
       // 简单存储，不依赖复杂的 card 对象
       fsrsCard: { state: 0, interval: newInterval },

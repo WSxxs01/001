@@ -112,8 +112,8 @@ function openAddBookModal() {
         <div class="number">{{ store.overdueCount }}</div>
         <div class="label">已逾期</div>
       </div>
-      <div class="stat-card" style="background: linear-gradient(135deg, #e3f2fd, #f1f8f1);">
-        <div class="number" style="color: #1976d2">{{ store.reviewQueue.length }}</div>
+      <div class="stat-card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(6, 182, 212, 0.1));">
+        <div class="number" style="color: var(--info)">{{ store.reviewQueue.length }}</div>
         <div class="label">复习队列</div>
       </div>
     </div>
@@ -204,7 +204,7 @@ h1 {
   font-size: 28px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
 }
 
 .settings-btn {
@@ -218,6 +218,7 @@ h1 {
   vertical-align: middle;
   transition: all 0.3s ease;
   backdrop-filter: var(--glass-blur);
+  color: var(--text-primary);
 }
 
 .settings-btn:hover {
@@ -226,7 +227,7 @@ h1 {
   transform: rotate(30deg);
 }
 
-/* 统计卡片 */
+/* 统计卡片 - 应用 glass-panel */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -235,47 +236,55 @@ h1 {
 }
 
 .stat-card {
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
+  /* 应用 .glass-panel 样式 */
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
   padding: 20px 15px;
   text-align: center;
-  box-shadow: var(--glass-shadow);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
-  border-color: var(--glass-border-hover);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
 }
 
 .stat-card .number {
   font-size: 36px;
-  font-weight: bold;
+  font-weight: 700;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 2px 10px rgba(255,255,255,0.2);
 }
 
 .stat-card.success .number {
   background: var(--gradient-success);
   -webkit-background-clip: text;
   background-clip: text;
+  text-shadow: 0 2px 10px rgba(52, 211, 153, 0.3);
 }
 
 .stat-card.warning .number {
   background: var(--gradient-warning);
   -webkit-background-clip: text;
   background-clip: text;
+  text-shadow: 0 2px 10px rgba(251, 191, 36, 0.3);
 }
 
 .stat-card.danger .number {
   background: var(--gradient-danger);
   -webkit-background-clip: text;
   background-clip: text;
+  text-shadow: 0 2px 10px rgba(248, 113, 113, 0.3);
 }
 
 .stat-card .label {
@@ -284,15 +293,19 @@ h1 {
   font-size: 13px;
 }
 
-/* 进度条 */
+/* 进度条 - 底轨 + 渐变发光 */
 .progress-section {
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
+  /* 应用 .glass-panel 样式 */
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: var(--glass-shadow);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
 .progress-bar {
@@ -304,10 +317,10 @@ h1 {
 
 .progress-fill {
   height: 100%;
-  background: var(--gradient-primary);
+  background: var(--gradient-chart);
   transition: width 0.5s ease;
   border-radius: 6px;
-  box-shadow: 0 0 20px rgba(129, 140, 248, 0.5);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.3);
 }
 
 .progress-text {
@@ -332,15 +345,18 @@ h1 {
   font-size: 16px;
 }
 
-/* 面板 */
+/* 面板 - 应用 glass-panel */
 .panel {
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: var(--glass-shadow);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
 .panel h2 {
@@ -361,22 +377,31 @@ h1 {
 }
 
 .add-btn {
-  padding: 10px 20px;
-  background: var(--gradient-success);
-  border: none;
+  /* 应用 .glass-btn 样式 */
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+  border: 1px solid rgba(255,255,255,0.25);
   border-radius: var(--radius-md);
+  padding: 10px 20px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
-  color: white;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  color: var(--success-light);
+  transition: all 0.2s ease;
   white-space: nowrap;
-  box-shadow: 0 4px 15px rgba(52, 211, 153, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .add-btn:hover {
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(52, 211, 153, 0.4);
+  box-shadow: 0 6px 20px rgba(52, 211, 153, 0.3);
+  border-color: rgba(255,255,255,0.35);
+}
+
+.add-btn:active {
+  transform: scale(0.96);
 }
 
 /* 响应式 */
@@ -515,7 +540,8 @@ h1 {
 
 .undo-btn {
   background: var(--gradient-warning);
-  color: #1a1a1a;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
   border: none;
   padding: 6px 16px;
   border-radius: var(--radius-md);

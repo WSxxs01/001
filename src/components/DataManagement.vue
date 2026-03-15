@@ -82,17 +82,28 @@ function handleImport(event) {
 
 <style scoped>
 .data-management {
-  background: white;
-  border-radius: 16px;
+  /* 应用 .glass-panel 样式 */
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.data-management:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .data-management h3 {
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 15px;
   font-size: 16px;
+  font-weight: 500;
 }
 
 .data-actions {
@@ -104,34 +115,41 @@ function handleImport(event) {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 100%);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--primary-light);
+  backdrop-filter: blur(10px);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.05) 100%);
+  box-shadow: 0 4px 15px rgba(129, 140, 248, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
 }
 
 .btn-secondary {
-  background: #f5f5f5;
-  color: #666;
-  border: 2px solid #e0e0e0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
 }
 
 .btn-secondary:hover {
-  background: #e8e8e8;
-  border-color: #d0d0d0;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 </style>
