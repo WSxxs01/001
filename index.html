@@ -24,8 +24,19 @@
       console.log('[vConsole] 移动端调试控制台已启动');
     </script>
 
-    <!-- 全局 CSS 修复：禁止事件吞噬 -->
+    <!-- 全局 CSS 修复：禁止事件吞噬 + 强制暗黑背景 -->
     <style>
+      /* 强制暗黑背景 */
+      html, body, #app {
+        background-color: #0b1120 !important;
+        background-image:
+          radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.4), transparent 50%),
+          radial-gradient(circle at 85% 30%, rgba(14, 116, 144, 0.4), transparent 50%) !important;
+        color: #f1f5f9 !important;
+        min-height: 100vh;
+        margin: 0;
+      }
+
       /* 禁止按钮内部元素吞噬点击事件 */
       button * {
         pointer-events: none !important;
@@ -59,17 +70,6 @@
       }
     </style>
   </head>
-  <style>
-    html, body, #app {
-      background-color: #0b1120 !important;
-      background-image:
-        radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.4), transparent 50%),
-        radial-gradient(circle at 85% 30%, rgba(14, 116, 144, 0.4), transparent 50%) !important;
-      color: #f1f5f9 !important;
-      min-height: 100vh;
-      margin: 0;
-    }
-  </style>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
