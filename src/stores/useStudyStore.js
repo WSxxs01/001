@@ -122,7 +122,46 @@ export const useStudyStore = defineStore('study', () => {
     return books.value[currentBookId.value].chapters
   })
 
-  // 所有需要复习的小节（今日+逾期）
+  // 所有需要复习的小节（今日+逾期）- 使用 FSRS 数据
+  const dueQueue = computed(() => {
+    const today = getToday()
+    const queue = []
+
+    Object.entries(studyData.value).forEach(([key, data]) => {
+      if (!data || !data.learned) return
+
+      // 使用 FSRS due 字段判断
+      if (data.due && data.due <= today) {
+        // 获取上下文信息
+        const [bookId, chapterIdx, sectionIdx] = key.split('_')
+        const book = books.value[bookId]
+        const chapter = book?.chapters[parseInt(chapterIdx)]
+        const sectionName = chapter?.sections[parseInt(sectionIdx)]
+
+        queue.push({
+          key,
+          bookId,
+          bookName: book?.name || '',
+          chapterName: chapter?.name || '',
+          sectionName: sectionName || '',
+          due: data.due,
+          status: data.due < today ? 'overdue' : 'today'
+        })
+      }
+    })
+
+    // 按书籍和章节排序
+    queue.sort((a, b) => {
+      if (a.bookId !== b.bookId) return a.bookId.localeCompare(b.bookId)
+      const aChapter = a.key.split('_')[1]
+      const bChapter = b.key.split('_')[1]
+      return parseInt(aChapter) - parseInt(bChapter)
+    })
+
+    return queue
+  })
+
+  // 兼容旧数据：所有需要复习的小节（今日+逾期）
   const reviewQueue = computed(() => {
     const today = getToday()
     const queue = []
@@ -565,6 +604,7 @@ export const useStudyStore = defineStore('study', () => {
     todayReviewCount,
     overdueCount,
     currentBookChapters,
+    dueQueue,
     reviewQueue,
 
     // 是否可以撤销

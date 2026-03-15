@@ -8,10 +8,12 @@ import ContributionHeatmap from './components/ContributionHeatmap.vue'
 import AddBookModal from './components/AddBookModal.vue'
 import DataManagement from './components/DataManagement.vue'
 import SettingsModal from './components/SettingsModal.vue'
+import ReviewModal from './components/ReviewModal.vue'
 
 const store = useStudyStore()
 const addBookModal = ref(null)
 const settingsModal = ref(null)
+const reviewModal = ref(null)
 
 // PWA 安装提示
 const deferredPrompt = ref(null)
@@ -132,6 +134,19 @@ function openAddBookModal() {
       </div>
     </div>
 
+    <!-- 专注复习模式按钮 -->
+    <div class="focus-review-section">
+      <button
+        class="focus-review-btn"
+        :class="{ disabled: store.dueQueue.length === 0 }"
+        @click="reviewModal?.openModal()"
+      >
+        <span class="focus-icon">🚀</span>
+        <span class="focus-text" v-if="store.dueQueue.length > 0">开始今日复习 (共 {{ store.dueQueue.length }} 个任务)</span>
+        <span class="focus-text" v-else>☕ 今日复习已清空，好好休息吧</span>
+      </button>
+    </div>
+
     <!-- 今日待复习提示 -->
     <div v-if="store.todayReviewCount > 0" class="today-alert">
       <h3>🔔 今日待复习 ({{ store.todayReviewCount }}个)</h3>
@@ -169,6 +184,9 @@ function openAddBookModal() {
 
     <!-- 同步设置弹窗 -->
     <SettingsModal ref="settingsModal" />
+
+    <!-- 专注复习弹窗 -->
+    <ReviewModal ref="reviewModal" />
 
     <!-- 数据管理 -->
     <DataManagement />
@@ -402,6 +420,85 @@ h1 {
 
 .add-btn:active {
   transform: scale(0.96);
+}
+
+/* 专注复习模式按钮 */
+.focus-review-section {
+  margin-bottom: 20px;
+}
+
+.focus-review-btn {
+  width: 100%;
+  padding: 20px 30px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.2));
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: var(--radius-xl);
+  color: #f1f5f9;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+  animation: focusPulse 2s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes focusPulse {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(139, 92, 246, 0.5), 0 0 80px rgba(6, 182, 212, 0.3);
+  }
+}
+
+.focus-review-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.focus-review-btn:hover::before {
+  left: 100%;
+}
+
+.focus-review-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 40px rgba(139, 92, 246, 0.5);
+}
+
+.focus-review-btn:active {
+  transform: scale(0.98);
+}
+
+.focus-review-btn.disabled {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  cursor: not-allowed;
+  animation: none;
+  box-shadow: none;
+}
+
+.focus-review-btn.disabled .focus-text {
+  color: var(--text-muted);
+}
+
+.focus-icon {
+  font-size: 24px;
+}
+
+.focus-text {
+  color: #f1f5f9;
 }
 
 /* 响应式 */
