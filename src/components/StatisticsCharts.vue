@@ -336,6 +336,7 @@ onMounted(async () => {
   margin-bottom: 15px;
   font-size: 16px;
   font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .chart-container {
@@ -370,9 +371,10 @@ onMounted(async () => {
 }
 
 .schedule-table th {
-  background: var(--glass-bg);
-  color: var(--text-secondary);
-  font-weight: 600;
+  background: var(--bg-hover);
+  color: #8A8F98;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .schedule-table tr:hover {

@@ -222,11 +222,13 @@ const totalStats = computed(() => {
   font-size: 16px;
   margin: 0;
   font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .heatmap-stats {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #8A8F98;
+  font-weight: 400;
 }
 
 .heatmap-stats .separator {

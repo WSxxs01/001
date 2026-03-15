@@ -347,10 +347,11 @@ h1 {
 
 .stat-card .number {
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
   margin-bottom: 8px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  font-feature-settings: 'tnum' 1;
   /* 纵向渐变文字效果 */
   background: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.6) 100%);
   -webkit-background-clip: text;
@@ -565,7 +566,8 @@ h1 {
   gap: 10px;
   color: var(--text-primary);
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
@@ -812,6 +814,8 @@ h1 {
 
   .stat-card .number {
     font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
   }
 
   .stat-card .label {
