@@ -5,7 +5,7 @@
 
 :root {
   /* ==================== 背景色 ==================== */
-  --bg-base: #0a0e17;
+  --bg-base: #0b1120;
   --bg-deep: #060810;
 
   /* 极光渐变色 */
@@ -14,11 +14,11 @@
   --aurora-3: rgba(80, 60, 180, 0.15);
 
   /* ==================== 玻璃拟物化 ==================== */
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-bg-hover: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-hover: rgba(255, 255, 255, 0.15);
-  --glass-blur: blur(24px) saturate(180%);
+  --glass-bg: rgba(15, 23, 42, 0.5);
+  --glass-bg-hover: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-hover: rgba(255, 255, 255, 0.2);
+  --glass-blur: blur(16px) saturate(180%);
 
   /* ==================== 卡片颜色 ==================== */
   --card-bg: rgba(20, 25, 40, 0.7);
@@ -92,34 +92,32 @@ html {
 body {
   min-height: 100vh;
   font-family: var(--font-family);
-  background-color: var(--bg-base);
+  background-color: #0b1120 !important;
   background-image:
+    radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.4), transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(14, 116, 144, 0.4), transparent 50%),
     radial-gradient(circle at 20% 80%, var(--aurora-1), transparent 55%),
     radial-gradient(circle at 80% 20%, var(--aurora-2), transparent 50%),
-    radial-gradient(circle at 40% 40%, var(--aurora-3), transparent 60%),
-    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-base) 100%);
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-base) 100%) !important;
   background-attachment: fixed;
-  color: var(--text-primary);
+  color: #f1f5f9 !important;
   line-height: 1.5;
 }
 
 /* ==================== .glass-panel 主玻璃卡片 ==================== */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3),
-              inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  background: rgba(15, 23, 42, 0.6) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   border-radius: var(--radius-xl);
   transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .glass-panel:hover {
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+  background: rgba(15, 23, 42, 0.7) !important;
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
 }
 
 /* ==================== .glass-panel-thin 薄玻璃（小节用）================ */

@@ -6,6 +6,10 @@ import { getToday } from '../utils/sm2'
 
 Chart.register(...registerables)
 
+// 强制设置图表全局文字颜色
+Chart.defaults.color = 'rgba(255, 255, 255, 0.8)'
+Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)'
+
 const store = useStudyStore()
 
 const memoryChartRef = ref(null)
@@ -103,11 +107,11 @@ function renderMemoryChart() {
       datasets: [{
         label: '记忆保持率',
         data: [100, 80, 70, 60, 55, 50, 40],
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.15)',
+        borderColor: '#06b6d4',
+        backgroundColor: 'rgba(6, 182, 212, 0.5)',
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#8b5cf6',
+        pointBackgroundColor: '#06b6d4',
         pointBorderColor: 'rgba(255,255,255,0.8)',
         pointBorderWidth: 2,
         pointRadius: 5,
@@ -132,21 +136,21 @@ function renderMemoryChart() {
       scales: {
         x: {
           grid: {
-            color: 'rgba(255, 255, 255, 0.05)'
+            color: 'rgba(255, 255, 255, 0.1)'
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.5)'
+            color: 'rgba(255, 255, 255, 0.8)'
           }
         },
         y: {
           beginAtZero: true,
           max: 100,
           grid: {
-            color: 'rgba(255, 255, 255, 0.05)'
+            color: 'rgba(255, 255, 255, 0.1)'
           },
           ticks: {
             callback: value => value + '%',
-            color: 'rgba(255, 255, 255, 0.5)'
+            color: 'rgba(255, 255, 255, 0.8)'
           }
         }
       }
@@ -177,24 +181,24 @@ function renderReviewChart() {
         {
           label: '今日/逾期',
           data: todayData,
-          backgroundColor: 'rgba(248, 113, 113, 0.8)',
-          borderColor: '#f87171',
+          backgroundColor: 'rgba(236, 72, 153, 0.8)',
+          borderColor: '#ec4899',
           borderWidth: 0,
           borderRadius: 4
         },
         {
           label: '待复习',
           data: pendingData,
-          backgroundColor: 'rgba(251, 191, 36, 0.8)',
-          borderColor: '#fbbf24',
+          backgroundColor: 'rgba(249, 115, 22, 0.8)',
+          borderColor: '#f97316',
           borderWidth: 0,
           borderRadius: 4
         },
         {
           label: '已完成',
           data: completedData,
-          backgroundColor: 'rgba(52, 211, 153, 0.8)',
-          borderColor: '#34d399',
+          backgroundColor: 'rgba(6, 182, 212, 0.8)',
+          borderColor: '#06b6d4',
           borderWidth: 0,
           borderRadius: 4
         }
@@ -227,18 +231,18 @@ function renderReviewChart() {
             display: false
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.5)'
+            color: 'rgba(255, 255, 255, 0.8)'
           }
         },
         y: {
           stacked: true,
           beginAtZero: true,
           grid: {
-            color: 'rgba(255, 255, 255, 0.05)'
+            color: 'rgba(255, 255, 255, 0.1)'
           },
           ticks: {
             stepSize: 1,
-            color: 'rgba(255, 255, 255, 0.5)'
+            color: 'rgba(255, 255, 255, 0.8)'
           }
         }
       }
