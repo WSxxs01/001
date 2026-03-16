@@ -73,14 +73,14 @@ export const useStudyStore = defineStore('study', () => {
     return Object.values(studyData.value).filter(d => d && d.learned).length
   })
 
-  // 今日待复习数量 (FSRS)
+  // 今日待复习数量 (FSRS) - 仅今天到期，不包含逾期
   const todayReviewCount = computed(() => {
     const today = getToday()
     let count = 0
     Object.values(studyData.value).forEach(data => {
       if (data && data.learned) {
-        // FSRS 逻辑
-        if (data.fsrsCard && data.due === today) {
+        // FSRS 逻辑 - 仅今天到期
+        if (data.fsrsCard && data.due && data.due === today) {
           count++
         } else if (!data.fsrsCard && data.reviews) {
           // 兼容旧数据
