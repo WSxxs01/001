@@ -8,7 +8,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#050506" />
-    <title>艾宾浩斯复习打卡系统</title>
+    <title>FSRS 智能记忆调度中心</title>
+
+    <!-- Inter 字体 - Linear 设计系统灵魂 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- 全局主题样式 -->
     <link rel="stylesheet" href="/src/assets/theme.css" />
@@ -16,19 +21,31 @@
     <!-- 全局 CSS 修复：禁止事件吞噬 + 强制暗黑背景 -->
     <style>
       /* ============================================
-         强制级暗黑背景系统 (Linear Style)
+         第一步：Body 兜底 + 相对定位
          ============================================ */
-      html, body, #app {
-        background-color: #050506 !important;
-        background-image:
-          radial-gradient(ellipse 80% 50% at 50% -20%, rgba(94, 106, 210, 0.15) 0%, transparent 50%),
-          radial-gradient(ellipse 60% 40% at 10% 10%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
-          radial-gradient(ellipse 50% 50% at 90% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 40%),
-          linear-gradient(180deg, #050506 0%, #020203 100%) !important;
-        background-attachment: fixed !important;
-        color: #EDEDEF !important;
-        min-height: 100vh;
+      body, html {
         margin: 0;
+        padding: 0;
+        background-color: #050506; /* 极客深渊黑底色兜底 */
+        min-height: 100vh;
+
+        /* ============================================
+           顶级字体栈 & 抗锯齿 (Typography Optimization)
+           ============================================ */
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif !important;
+
+        /* 暗色模式抗锯齿 - 让字体变细变锐利 */
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale !important;
+        text-rendering: optimizeLegibility !important;
+      }
+
+      #app {
+        /* 确保 Vue 根节点是透明的，不要遮挡底下的极光 */
+        background: transparent !important;
+        position: relative;
+        z-index: 1;
+        color: #EDEDEF !important;
         overflow-x: hidden;
       }
 

@@ -8,10 +8,10 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: '艾宾浩斯打卡系统',
-        short_name: '复习打卡',
-        theme_color: '#667eea',
-        background_color: '#667eea',
+        name: 'FSRS 智能记忆调度中心',
+        short_name: 'FSRS 调度',
+        theme_color: '#5E6AD2',
+        background_color: '#050506',
         display: 'standalone',
         start_url: '/',
         icons: [
