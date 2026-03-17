@@ -8,6 +8,67 @@ import { uploadData, downloadData, getSyncConfig, debounce } from '../utils/sync
 const fsrs = new FSRS({})
 
 /**
+ * 【FSRS 数据净化器】强制确保卡片数据格式正确
+ * 这是防止 FSRS 引擎崩溃的最后一道防线
+ * @param {Object} item - 学习记录项
+ * @returns {Object} 净化后的数据
+ */
+function sanitizeFSRSCard(item) {
+  if (!item) return item
+
+  // 1. 如果是旧版数据（连 fsrsCard 都没有），强制套壳
+  if (!item.fsrsCard) {
+    console.log('[sanitizeFSRSCard] 检测到无 fsrsCard，创建空卡片套壳')
+    item.fsrsCard = createEmptyCard()
+    if (item.due) {
+      item.fsrsCard.due = new Date(item.due) // 继承旧版的复习时间
+    }
+  }
+
+  // 2. 核心：强制将所有的字符串时间转换为 Date 对象
+  // 这是 JSON 序列化/反序列化后的必要修复
+  if (item.fsrsCard.due) {
+    if (typeof item.fsrsCard.due === 'string') {
+      item.fsrsCard.due = new Date(item.fsrsCard.due)
+      console.log('[sanitizeFSRSCard] 修复 due: string -> Date')
+    } else if (!(item.fsrsCard.due instanceof Date)) {
+      // 处理其他奇怪的类型
+      item.fsrsCard.due = new Date(item.fsrsCard.due)
+    }
+  }
+
+  if (item.fsrsCard.last_review) {
+    if (typeof item.fsrsCard.last_review === 'string') {
+      item.fsrsCard.last_review = new Date(item.fsrsCard.last_review)
+      console.log('[sanitizeFSRSCard] 修复 last_review: string -> Date')
+    } else if (!(item.fsrsCard.last_review instanceof Date)) {
+      item.fsrsCard.last_review = new Date(item.fsrsCard.last_review)
+    }
+  }
+
+  // 3. 确保卡片有所有必要的字段（防御性编程）
+  if (typeof item.fsrsCard.difficulty !== 'number') {
+    item.fsrsCard.difficulty = item.difficulty || 5.0
+  }
+  if (typeof item.fsrsCard.stability !== 'number') {
+    item.fsrsCard.stability = item.stability || 0.5
+  }
+  if (typeof item.fsrsCard.reps !== 'number') {
+    item.fsrsCard.reps = item.repetitions || 0
+  }
+
+  // 4. 同步顶层字段（确保 UI 和逻辑一致性）
+  if (item.fsrsCard.due) {
+    const dueStr = formatDate(item.fsrsCard.due)
+    if (item.due !== dueStr) {
+      item.due = dueStr
+    }
+  }
+
+  return item
+}
+
+/**
  * 【数据清洗与迁移】将旧版艾宾浩斯数据迁移到 FSRS 格式
  * @param {Object} studyData - 学习记录数据
  * @returns {Object} 清洗后的数据
@@ -466,7 +527,8 @@ export const useStudyStore = defineStore('study', () => {
       return studyData.value[sectionKey]
     }
 
-    // 已学习过，直接返回
+    // 已学习过，净化后返回（防止 JSON 序列化导致 Date 变字符串）
+    sanitizeFSRSCard(data)
     return data
   }
 
@@ -491,6 +553,9 @@ export const useStudyStore = defineStore('study', () => {
       }
       pushHistory(sectionKey, historyData)
 
+      // 【关键】强制净化 FSRS 卡片数据（防止 JSON 序列化导致 Date 变字符串）
+      sanitizeFSRSCard(data)
+
       // 使用 ts-fsrs 进行调度
       const now = new Date()
       const card = data.fsrsCard
@@ -498,6 +563,11 @@ export const useStudyStore = defineStore('study', () => {
       // 确保 card 是有效的
       if (!card || !card.due) {
         throw new Error('无效的 FSRS 卡片数据')
+      }
+
+      // 最终安全检查：确保 due 是 Date 对象
+      if (!(card.due instanceof Date)) {
+        throw new Error(`FSRS 卡片 due 字段类型错误: ${typeof card.due}`)
       }
 
       // 调用 FSRS 算法
