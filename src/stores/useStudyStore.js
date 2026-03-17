@@ -10,56 +10,116 @@ const fsrs = new FSRS({})
 /**
  * 【FSRS 数据净化器】强制确保卡片数据格式正确
  * 这是防止 FSRS 引擎崩溃的最后一道防线
- * @param {Object} item - 学习记录项
- * @returns {Object} 净化后的数据
+ * @param {Object} item - 学习记录项（直接修改原对象）
  */
 function sanitizeFSRSCard(item) {
-  if (!item) return item
+  if (!item || typeof item !== 'object') return
 
-  // 判断条件：如果没有 fsrsCard，或者 fsrsCard 是个残缺对象（比如缺少核心的 stability）
-  if (!item.fsrsCard || typeof item.fsrsCard.stability === 'undefined') {
+  // ========== 第一层：确保 fsrsCard 存在且完整 ==========
+  const hasValidCard = item.fsrsCard &&
+    typeof item.fsrsCard === 'object' &&
+    typeof item.fsrsCard.stability === 'number' &&
+    typeof item.fsrsCard.difficulty === 'number'
+
+  if (!hasValidCard) {
     console.log('[sanitizeFSRSCard] 检测到无效/残缺 fsrsCard，重新生成标准卡片')
 
     // 提取旧版的复习时间（如果存在的话）
-    const oldDue = item.fsrsCard?.due || item.due || new Date()
+    const oldDue = item.fsrsCard?.due || item.due
 
-    // 核心操作：强制生成符合 FSRS 官方标准的完整 21 参数空卡片
-    item.fsrsCard = createEmptyCard()
+    // 核心操作：强制生成符合 FSRS 官方标准的完整空卡片
+    const newCard = createEmptyCard()
 
-    // 将旧版的复习时间继承给新生成的标准 FSRS 卡片
-    item.fsrsCard.due = new Date(oldDue)
-
-    console.log('[sanitizeFSRSCard] 已生成标准 FSRS 卡片，due:', item.fsrsCard.due)
-  } else {
-    // 如果已经是规范的 FSRS 卡片，只处理 Date 对象的反序列化
-    if (item.fsrsCard.due) {
-      item.fsrsCard.due = new Date(item.fsrsCard.due)
+    // 继承旧时间或设置为明天
+    if (oldDue) {
+      newCard.due = new Date(oldDue)
+    } else {
+      // 默认设置为明天到期
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      newCard.due = tomorrow
     }
-    if (item.fsrsCard.last_review) {
-      item.fsrsCard.last_review = new Date(item.fsrsCard.last_review)
+
+    // 确保卡片有所有必要字段
+    newCard.difficulty = typeof newCard.difficulty === 'number' ? newCard.difficulty : (item.difficulty || 5.0)
+    newCard.stability = typeof newCard.stability === 'number' ? newCard.stability : (item.stability || 0.5)
+    newCard.reps = typeof newCard.reps === 'number' ? newCard.reps : (item.repetitions || 0)
+    newCard.scheduled_days = typeof newCard.scheduled_days === 'number' ? newCard.scheduled_days : 0
+    newCard.state = typeof newCard.state === 'number' ? newCard.state : 0
+
+    // 直接赋值给 item 的属性（确保响应式）
+    item.fsrsCard = newCard
+
+    console.log('[sanitizeFSRSCard] 已生成标准 FSRS 卡片:', {
+      due: item.fsrsCard.due,
+      stability: item.fsrsCard.stability,
+      difficulty: item.fsrsCard.difficulty
+    })
+  }
+
+  // ========== 第二层：确保 Date 对象是有效的 ==========
+  const card = item.fsrsCard
+
+  // due 字段强制转换
+  if (!card.due || !(card.due instanceof Date) || isNaN(card.due.getTime())) {
+    const oldDueStr = card.due
+    card.due = new Date(card.due || new Date())
+    if (isNaN(card.due.getTime())) {
+      // 如果转换失败，设置为明天
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      card.due = tomorrow
+    }
+    console.log('[sanitizeFSRSCard] due 字段已修复:', oldDueStr, '->', card.due)
+  }
+
+  // last_review 字段修复
+  if (card.last_review) {
+    if (!(card.last_review instanceof Date) || isNaN(card.last_review.getTime())) {
+      card.last_review = new Date(card.last_review)
+      if (isNaN(card.last_review.getTime())) {
+        delete card.last_review // 无效日期则删除
+      }
     }
   }
 
-  // 最终安全网：确保所有核心字段都是正确的类型
-  if (typeof item.fsrsCard.difficulty !== 'number') {
-    item.fsrsCard.difficulty = item.difficulty || 5.0
+  // ========== 第三层：确保所有核心字段类型正确 ==========
+  if (typeof card.difficulty !== 'number' || isNaN(card.difficulty)) {
+    card.difficulty = item.difficulty || 5.0
   }
-  if (typeof item.fsrsCard.stability !== 'number') {
-    item.fsrsCard.stability = item.stability || 0.5
+  if (typeof card.stability !== 'number' || isNaN(card.stability)) {
+    card.stability = item.stability || 0.5
   }
-  if (typeof item.fsrsCard.reps !== 'number') {
-    item.fsrsCard.reps = item.repetitions || 0
+  if (typeof card.reps !== 'number' || isNaN(card.reps)) {
+    card.reps = item.repetitions || 0
   }
-
-  // 同步顶层字段（确保 UI 和逻辑一致性）
-  if (item.fsrsCard.due) {
-    const dueStr = formatDate(item.fsrsCard.due)
-    if (item.due !== dueStr) {
-      item.due = dueStr
-    }
+  if (typeof card.scheduled_days !== 'number' || isNaN(card.scheduled_days)) {
+    card.scheduled_days = 0
+  }
+  if (typeof card.state !== 'number') {
+    card.state = 0
   }
 
-  return item
+  // ========== 第四层：同步顶层字段 ==========
+  const dueStr = formatDate(card.due)
+  if (item.due !== dueStr) {
+    item.due = dueStr
+  }
+  if (item.stability !== card.stability) {
+    item.stability = card.stability
+  }
+  if (item.difficulty !== card.difficulty) {
+    item.difficulty = card.difficulty
+  }
+  if (item.repetitions !== card.reps) {
+    item.repetitions = card.reps
+  }
+
+  console.log('[sanitizeFSRSCard] 净化完成:', {
+    due: item.due,
+    stability: item.stability,
+    state: card.state
+  })
 }
 
 /**
@@ -350,17 +410,27 @@ export const useStudyStore = defineStore('study', () => {
       const parsedData = JSON.parse(savedData)
 
       // 【关键】数据清洗与迁移：处理旧版数据 + 修复 Date 反序列化
-      studyData.value = migrateLegacyData(parsedData)
+      const migratedData = migrateLegacyData(parsedData)
 
-      // 【关键】强制净化所有 FSRS 卡片（防止残缺数据导致引擎崩溃）
-      Object.values(studyData.value).forEach(item => {
-        if (item && item.learned) {
+      // 【终极关键】强制深度净化所有 FSRS 卡片
+      // 遍历所有 item，无论是否 learned，都确保有完整的 fsrsCard
+      Object.entries(migratedData).forEach(([key, item]) => {
+        if (item) {
+          console.log(`[initStore] 净化 item: ${key}`, {
+            hasFsrsCard: !!item.fsrsCard,
+            hasStability: item.fsrsCard ? typeof item.fsrsCard.stability !== 'undefined' : false
+          })
           sanitizeFSRSCard(item)
         }
       })
 
+      // 使用展开运算符创建新对象，确保 Vue 响应式
+      studyData.value = { ...migratedData }
+
       // 如果迁移后有修改，立即保存回本地存储
       localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
+
+      console.log('[initStore] 数据加载并净化完成，item 数量:', Object.keys(studyData.value).length)
     } else {
       studyData.value = {}
     }
@@ -561,14 +631,26 @@ export const useStudyStore = defineStore('study', () => {
       const now = new Date()
       const card = data.fsrsCard
 
+      console.log('[submitReview] 卡片数据:', {
+        hasCard: !!card,
+        hasDue: !!card?.due,
+        dueType: card?.due ? typeof card.due : 'none',
+        dueIsDate: card?.due instanceof Date,
+        stability: card?.stability,
+        difficulty: card?.difficulty
+      })
+
       // 确保 card 是有效的
-      if (!card || !card.due) {
-        throw new Error('无效的 FSRS 卡片数据')
+      if (!card) {
+        throw new Error('无效的 FSRS 卡片数据：card 为空')
+      }
+      if (!card.due) {
+        throw new Error('无效的 FSRS 卡片数据：card.due 为空')
       }
 
       // 最终安全检查：确保 due 是 Date 对象
       if (!(card.due instanceof Date)) {
-        throw new Error(`FSRS 卡片 due 字段类型错误: ${typeof card.due}`)
+        throw new Error(`FSRS 卡片 due 字段类型错误: ${typeof card.due}，值: ${card.due}`)
       }
 
       // 调用 FSRS 算法
@@ -739,15 +821,23 @@ export const useStudyStore = defineStore('study', () => {
         // 【关键】导入时执行数据清洗与迁移
         const migratedData = migrateLegacyData(data.studyData)
 
-        // 【关键】强制净化所有导入的 FSRS 卡片（防止残缺数据导致引擎崩溃）
-        Object.values(migratedData).forEach(item => {
-          if (item && item.learned) {
+        // 【终极关键】强制深度净化所有 FSRS 卡片
+        // 遍历所有 item，无论是否 learned，都确保有完整的 fsrsCard
+        Object.entries(migratedData).forEach(([key, item]) => {
+          if (item) {
+            console.log(`[importData] 净化 item: ${key}`, {
+              hasFsrsCard: !!item.fsrsCard,
+              hasStability: item.fsrsCard ? typeof item.fsrsCard.stability !== 'undefined' : false
+            })
             sanitizeFSRSCard(item)
           }
         })
 
-        studyData.value = migratedData
+        // 直接修改对象后赋值，确保 Vue 响应式能检测到变化
+        studyData.value = { ...migratedData }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
+
+        console.log('[importData] 数据导入并净化完成，item 数量:', Object.keys(studyData.value).length)
       }
 
       // 重置当前选中的书籍
