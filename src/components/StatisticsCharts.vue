@@ -91,7 +91,7 @@ function getShortDate(dateStr) {
   return `${month}/${day}`
 }
 
-// 渲染遗忘曲线图
+// 渲染 FSRS 记忆可提取率曲线
 function renderMemoryChart() {
   if (!memoryChartRef.value) return
 
@@ -164,7 +164,7 @@ function renderMemoryChart() {
   })
 }
 
-// 渲染未来7天复习预览
+// 渲染未来7天动态调度负荷
 function renderReviewChart() {
   if (!reviewChartRef.value) return
 
@@ -283,17 +283,17 @@ onMounted(async () => {
 <template>
   <div class="charts-section">
     <div class="chart-card glass-panel">
-      <h3>📊 艾宾浩斯遗忘曲线</h3>
+      <h3>📊 FSRS 记忆可提取率 (Retrievability) 动态预测</h3>
       <div class="chart-container">
         <canvas ref="memoryChartRef"></canvas>
       </div>
       <div class="chart-desc">
-        记忆保持率随时间推移逐渐下降，需要定期复习来巩固
+        基于 DSR 记忆动力学模型，展示特定稳定性 (S) 下的召回概率幂函数衰减
       </div>
     </div>
 
     <div class="chart-card glass-panel">
-      <h3>📅 未来7天复习预览</h3>
+      <h3>📅 未来 7 天动态调度负荷 (Workload)</h3>
       <div class="chart-container">
         <canvas ref="reviewChartRef"></canvas>
       </div>
@@ -301,17 +301,16 @@ onMounted(async () => {
         <table>
           <thead>
             <tr>
-              <th>复习次数</th>
-              <th>间隔</th>
-              <th>记忆保持率</th>
+              <th>用户反馈 (Rating)</th>
+              <th>状态转移</th>
+              <th>稳定性 S 变化</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>第1次</td><td>1天后</td><td>约80%</td></tr>
-            <tr><td>第2次</td><td>2天后</td><td>约70%</td></tr>
-            <tr><td>第3次</td><td>4天后</td><td>约60%</td></tr>
-            <tr><td>第4次</td><td>7天后</td><td>约55%</td></tr>
-            <tr><td>第5次</td><td>15天后</td><td>约50%</td></tr>
+            <tr><td>🔴 困难 (Hard)</td><td>维持/下降</td><td>极其缓慢增长</td></tr>
+            <tr><td>🟠 遗忘 (Again)</td><td>记忆重塑</td><td>稳定性重置</td></tr>
+            <tr><td>🟢 良好 (Good)</td><td>正常巩固</td><td>稳步指数增长</td></tr>
+            <tr><td>🔵 简单 (Easy)</td><td>长期记忆</td><td>跨越式暴增</td></tr>
           </tbody>
         </table>
       </div>

@@ -1,10 +1,9 @@
 /**
- * SM-2 艾宾浩斯记忆算法
- * 基于 SuperMemo-2 算法的简化实现
+ * 日期与格式化工具
+ * 为 FSRS 智能记忆调度系统提供日期处理支持
  */
 
-// 艾宾浩斯基础复习间隔（天）
-export const REVIEW_INTERVALS = [1, 2, 4, 7, 15]
+// 日期格式化常量
 
 // SM-2 配置
 export const SM2_CONFIG = {
@@ -74,7 +73,7 @@ export function getToday() {
 
 /**
  * 计算下一次复习日期
- * @param {Object} currentData - 当前小节学习数据
+ * @param {Object} currentData - 当前知识模块学习数据
  * @param {string} feedback - 反馈类型 ('easy', 'normal', 'hard')
  * @returns {Object} 更新后的学习数据
  */
@@ -159,9 +158,9 @@ function getNewMasteryLevel(current, feedback) {
 }
 
 /**
- * 初始化小节学习数据
+ * 初始化知识模块学习数据
  * @param {string} learnDate - 学习日期
- * @param {string} sectionName - 小节名称
+ * @param {string} sectionName - 知识模块名称
  * @param {string} chapterName - 章节名称
  * @param {string} bookKey - 书籍Key
  */
@@ -180,7 +179,7 @@ export function initSectionData(learnDate, sectionName, chapterName, bookKey) {
 }
 
 /**
- * 获取小节状态
+ * 获取知识模块状态
  * @param {Object} data - 学习数据
  * @param {string} today - 今天的日期
  * @returns {string} 状态: 'unstarted', 'learning', 'today', 'overdue', 'completed'

@@ -95,7 +95,7 @@ function openAddBookModal() {
     <header class="app-header">
       <h1>
         <span class="title-icon">📚</span>
-        <span class="title-text">艾宾浩斯复习打卡系统</span>
+        <span class="title-text">FSRS 智能记忆调度中心</span>
       </h1>
       <button
         class="settings-btn"
@@ -110,7 +110,7 @@ function openAddBookModal() {
     <!-- 顶部统计卡片 -->
     <section class="stats-row">
       <div class="stat-card glass-panel" v-for="(stat, index) in [
-        { label: '总小节', value: store.totalSections, key: 'total' },
+        { label: '记忆节点', value: store.totalSections, key: 'total' },
         { label: '已学习', value: store.learnedCount, key: 'success' },
         { label: '今日待复习', value: store.todayReviewCount, key: 'warning' },
         { label: '已逾期', value: store.overdueCount, key: 'danger' },
@@ -131,7 +131,7 @@ function openAddBookModal() {
       </div>
       <div class="progress-text">
         学习进度：{{ store.totalSections ? Math.round(store.learnedCount / store.totalSections * 100) : 0 }}%
-        <span class="progress-detail">({{ store.learnedCount }}/{{ store.totalSections }} 小节)</span>
+        <span class="progress-detail">({{ store.learnedCount }}/{{ store.totalSections }} 节点)</span>
       </div>
     </section>
 

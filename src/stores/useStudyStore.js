@@ -1,8 +1,20 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
+import { FSRS, createEmptyCard, Rating } from 'ts-fsrs'
 import { getToday, formatDate } from '../utils/sm2'
-import { scheduleNextReview, handleFirstLearn, isCardDue, Rating } from '../utils/fsrs-engine'
 import { uploadData, downloadData, getSyncConfig, debounce } from '../utils/sync'
+
+// 初始化 FSRS 调度器
+const fsrs = new FSRS({})
+
+// Rating 映射：将字符串反馈转为 FSRS Rating 枚举
+const ratingMap = {
+  'again': Rating.Again,   // 忘记 -> Again
+  'hard': Rating.Hard,     // 困难 -> Hard (兼容)
+  'normal': Rating.Good,   // 一般 -> Good (兼容旧代码/SectionItem)
+  'good': Rating.Good,     // 良好 -> Good
+  'easy': Rating.Easy      // 简单 -> Easy
+}
 
 const STORAGE_KEY = 'eb-study-data'
 const BOOKS_KEY = 'eb-books'
@@ -57,7 +69,7 @@ export const useStudyStore = defineStore('study', () => {
   }, 3000)
 
   // ==================== Getters ====================
-  // 总小节数
+  // 总记忆节点数
   const totalSections = computed(() => {
     let count = 0
     Object.values(books.value).forEach(book => {
@@ -122,16 +134,24 @@ export const useStudyStore = defineStore('study', () => {
     return books.value[currentBookId.value].chapters
   })
 
-  // 所有需要复习的小节（今日+逾期）- 使用 FSRS 数据
+  // 所有需要复习的记忆节点（今日+逾期）- 使用 FSRS 数据
   const dueQueue = computed(() => {
-    const today = getToday()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0) // 重置为当天开始
+    const todayStr = getToday()
     const queue = []
 
     Object.entries(studyData.value).forEach(([key, data]) => {
-      if (!data || !data.learned) return
+      if (!data || !data.learned || !data.fsrsCard) return
 
-      // 使用 FSRS due 字段判断
-      if (data.due && data.due <= today) {
+      // 使用 FSRS fsrsCard.due Date 对象判断
+      const dueDate = data.fsrsCard.due instanceof Date
+        ? data.fsrsCard.due
+        : new Date(data.fsrsCard.due)
+
+      // 比较日期（忽略时间部分）
+      const dueDateStr = formatDate(dueDate)
+      if (dueDateStr <= todayStr) {
         // 获取上下文信息
         const [bookId, chapterIdx, sectionIdx] = key.split('_')
         const book = books.value[bookId]
@@ -144,8 +164,8 @@ export const useStudyStore = defineStore('study', () => {
           bookName: book?.name || '',
           chapterName: chapter?.name || '',
           sectionName: sectionName || '',
-          due: data.due,
-          status: data.due < today ? 'overdue' : 'today'
+          due: dueDateStr,
+          status: dueDateStr < todayStr ? 'overdue' : 'today'
         })
       }
     })
@@ -161,7 +181,7 @@ export const useStudyStore = defineStore('study', () => {
     return queue
   })
 
-  // 兼容旧数据：所有需要复习的小节（今日+逾期）
+  // 兼容旧数据：所有需要复习的记忆节点（今日+逾期）
   const reviewQueue = computed(() => {
     const today = getToday()
     const queue = []
@@ -194,6 +214,18 @@ export const useStudyStore = defineStore('study', () => {
     const savedData = localStorage.getItem(STORAGE_KEY)
     if (savedData) {
       studyData.value = JSON.parse(savedData)
+
+      // 【关键】修复 FSRS Date 反序列化：将字符串转回 Date 对象
+      Object.values(studyData.value).forEach(data => {
+        if (data && data.fsrsCard) {
+          if (data.fsrsCard.due && typeof data.fsrsCard.due === 'string') {
+            data.fsrsCard.due = new Date(data.fsrsCard.due)
+          }
+          if (data.fsrsCard.last_review && typeof data.fsrsCard.last_review === 'string') {
+            data.fsrsCard.last_review = new Date(data.fsrsCard.last_review)
+          }
+        }
+      })
     } else {
       studyData.value = {}
     }
@@ -303,7 +335,7 @@ export const useStudyStore = defineStore('study', () => {
     // 删除章节
     const deletedChapter = book.chapters.splice(chapterIdx, 1)[0]
 
-    // 删除对应的小节学习记录
+    // 删除对应的知识模块记忆记录
     const keysToDelete = []
     Object.keys(studyData.value).forEach(key => {
       const parts = key.split('_')
@@ -327,94 +359,99 @@ export const useStudyStore = defineStore('study', () => {
 
   // 开始学习/打卡
   function startLearning(sectionKey) {
-    // 直接调用 submitReview 处理首次学习（内部会使用 FSRS）
-    return submitReview(sectionKey, 'normal')
+    const data = studyData.value[sectionKey]
+
+    // 如果未学习，先初始化 FSRS 卡片
+    if (!data || !data.learned) {
+      const today = new Date()
+      const [bookId, chapterIdx, sectionIdx] = sectionKey.split('_')
+      const book = books.value[bookId]
+      const chapter = book?.chapters[parseInt(chapterIdx)]
+      const sectionName = chapter?.sections[parseInt(sectionIdx)]
+
+      // 创建空卡片并调度首次复习
+      const card = createEmptyCard()
+      const scheduling = fsrs.repeat(card, today)
+      const result = scheduling[Rating.Good]
+
+      studyData.value[sectionKey] = {
+        learned: true,
+        learnDate: getToday(),
+        sectionName: sectionName,
+        chapterName: chapter?.name,
+        bookKey: bookId,
+        // FSRS 核心数据
+        fsrsCard: result.card,
+        due: formatDate(result.card.due),
+        difficulty: result.card.difficulty,
+        stability: result.card.stability,
+        interval: result.card.scheduled_days || 0,
+        repetitions: result.card.reps || 1
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
+      return studyData.value[sectionKey]
+    }
+
+    // 已学习过，直接返回
+    return data
   }
 
-  // 提交复习反馈
+  // 提交复习反馈 (使用原生 ts-fsrs)
   function submitReview(sectionKey, feedback) {
     try {
       const data = studyData.value[sectionKey]
 
       // 如果未学习，先初始化学习数据（首次学习）
       if (!data || !data.learned) {
-        // 保存历史状态（用于撤销）
-        if (data) {
-          pushHistory(sectionKey, data)
-        }
-
-        // 创建首次学习数据
-        const today = getToday()
-        const [bookId, chapterIdx, sectionIdx] = sectionKey.split('_')
-        const book = books.value[bookId]
-        const chapter = book?.chapters[parseInt(chapterIdx)]
-        const sectionName = chapter?.sections[parseInt(sectionIdx)]
-
-        // 首次学习使用 Good (normal) 评级
-        const initialResult = handleFirstLearn()
-
-        let cardData = initialResult?.card
-        if (!cardData) {
-          cardData = {}
-        }
-
-        // 处理 due 日期
-        let dueDate = today
-        if (initialResult?.due instanceof Date) {
-          dueDate = formatDate(initialResult.due)
-        }
-
-        studyData.value[sectionKey] = {
-          learned: true,
-          learnDate: today,
-          sectionName: sectionName,
-          chapterName: chapter?.name,
-          bookKey: bookId,
-          // FSRS 数据 - 严禁调用 toJSON
-          fsrsCard: cardData,
-          due: dueDate,
-          difficulty: initialResult?.difficulty ?? 1,
-          stability: initialResult?.stability ?? 0,
-          interval: initialResult?.interval ?? 0,
-          repetitions: initialResult?.reps ?? 1,
-          rating: 'good'
-        }
-
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
-        return studyData.value[sectionKey]
+        return startLearning(sectionKey)
       }
 
-      // 已学习，使用 FSRS 算法计算下次复习
-      // 保存历史状态（用于撤销）
-      pushHistory(sectionKey, data)
+      // 【关键】保存历史状态（用于撤销）- 深拷贝 fsrsCard
+      const historyData = JSON.parse(JSON.stringify(data))
+      // 恢复 Date 对象（JSON 序列化会转成字符串）
+      if (historyData.fsrsCard?.due) {
+        historyData.fsrsCard.due = new Date(historyData.fsrsCard.due)
+      }
+      if (historyData.fsrsCard?.last_review) {
+        historyData.fsrsCard.last_review = new Date(historyData.fsrsCard.last_review)
+      }
+      pushHistory(sectionKey, historyData)
 
-      const fsrsResult = scheduleNextReview(data, feedback)
+      // 使用 ts-fsrs 进行调度
+      const now = new Date()
+      const card = data.fsrsCard
 
-      if (!fsrsResult) {
-        alert('打卡失败，请查看控制台')
-        return data
+      // 确保 card 是有效的
+      if (!card || !card.due) {
+        throw new Error('无效的 FSRS 卡片数据')
       }
 
-      let cardData = fsrsResult?.fsrsCard
-      if (!cardData) {
-        cardData = {}
+      // 调用 FSRS 算法
+      const scheduling = fsrs.repeat(card, now)
+
+      // 获取对应评级的结果
+      const rating = ratingMap[feedback] || Rating.Good
+      const result = scheduling[rating]
+
+      if (!result || !result.card) {
+        throw new Error('FSRS 调度失败')
       }
 
-      // 更新数据 - 严禁调用 toJSON
+      const nextCard = result.card
+
+      // 更新数据
       studyData.value[sectionKey] = {
         ...data,
-        // FSRS 更新
-        fsrsCard: cardData,
-        due: fsrsResult?.due || data.due,
-        difficulty: fsrsResult?.difficulty ?? data.difficulty,
-        stability: fsrsResult?.stability ?? data.stability,
-        interval: fsrsResult?.interval ?? data.interval,
-        repetitions: fsrsResult?.repetitions ?? data.repetitions,
-        dueTimestamp: fsrsResult?.dueTimestamp ?? data.dueTimestamp,
+        // FSRS 核心数据
+        fsrsCard: nextCard,
+        due: formatDate(nextCard.due),
+        difficulty: nextCard.difficulty,
+        stability: nextCard.stability,
+        interval: nextCard.scheduled_days || 0,
+        repetitions: nextCard.reps || 0,
         // 保存当前评级
-        rating: feedback,
-        // 更新学习日期（如果是首次）
-        learnDate: data.learnDate || getToday()
+        rating: feedback
       }
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
@@ -423,7 +460,6 @@ export const useStudyStore = defineStore('study', () => {
     } catch (error) {
       console.error('打卡失败：', error)
       const errMsg = '打卡失败: ' + error.message
-      // 移动端友好提示
       if (typeof window !== 'undefined' && window.alert) {
         alert(errMsg)
       }
@@ -455,7 +491,19 @@ export const useStudyStore = defineStore('study', () => {
     const lastAction = historyStack.value.pop()
     if (lastAction) {
       // 恢复历史状态
-      studyData.value[lastAction.key] = lastAction.data
+      const restoredData = lastAction.data
+
+      // 【关键】恢复 Date 对象（JSON 序列化会转成字符串）
+      if (restoredData.fsrsCard) {
+        if (restoredData.fsrsCard.due && typeof restoredData.fsrsCard.due === 'string') {
+          restoredData.fsrsCard.due = new Date(restoredData.fsrsCard.due)
+        }
+        if (restoredData.fsrsCard.last_review && typeof restoredData.fsrsCard.last_review === 'string') {
+          restoredData.fsrsCard.last_review = new Date(restoredData.fsrsCard.last_review)
+        }
+      }
+
+      studyData.value[lastAction.key] = restoredData
       localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
       return true
     }
@@ -474,7 +522,7 @@ export const useStudyStore = defineStore('study', () => {
     }
   }
 
-  // 删除小节学习记录
+  // 删除知识模块记忆记录
   function deleteSection(sectionKey) {
     const data = studyData.value[sectionKey]
     if (!data) return false
@@ -482,7 +530,7 @@ export const useStudyStore = defineStore('study', () => {
     // 保存历史状态（用于撤销）
     pushHistory(sectionKey, data)
 
-    // 删除该小节的学习记录
+    // 删除该知识模块的记忆记录
     delete studyData.value[sectionKey]
 
     // 立即保存到本地存储
@@ -491,7 +539,7 @@ export const useStudyStore = defineStore('study', () => {
     return true
   }
 
-  // 获取小节状态
+  // 获取知识模块状态
   function getSectionStatus(sectionKey) {
     const data = studyData.value[sectionKey]
 
@@ -515,8 +563,11 @@ export const useStudyStore = defineStore('study', () => {
       return 'unstarted'
     }
 
-    // FSRS 逻辑 - 修复日期比较
-    const dueDate = data.due
+    // FSRS 逻辑 - 使用 fsrsCard.due 进行日期比较
+    const dueDate = data.fsrsCard?.due
+      ? (data.fsrsCard.due instanceof Date ? formatDate(data.fsrsCard.due) : data.fsrsCard.due)
+      : data.due
+
     if (!dueDate) return 'learning'
 
     // 使用日期比较
@@ -542,6 +593,19 @@ export const useStudyStore = defineStore('study', () => {
 
       if (data.studyData) {
         studyData.value = data.studyData
+
+        // 【关键】导入时修复 FSRS Date 反序列化
+        Object.values(studyData.value).forEach(item => {
+          if (item && item.fsrsCard) {
+            if (item.fsrsCard.due && typeof item.fsrsCard.due === 'string') {
+              item.fsrsCard.due = new Date(item.fsrsCard.due)
+            }
+            if (item.fsrsCard.last_review && typeof item.fsrsCard.last_review === 'string') {
+              item.fsrsCard.last_review = new Date(item.fsrsCard.last_review)
+            }
+          }
+        })
+
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data.studyData))
       }
 

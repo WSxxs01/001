@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { Rating } from 'ts-fsrs'
 import { useStudyStore } from '../stores/useStudyStore'
 
 const props = defineProps({
@@ -59,13 +60,20 @@ const progressText = computed(() => {
   return `${currentIndex.value + 1} / ${localReviewList.value.length}`
 })
 
+// FSRS Rating 映射
+const ratingMap = {
+  'again': Rating.Again,
+  'good': Rating.Good,
+  'easy': Rating.Easy
+}
+
 // 处理打卡
 function handleReview(feedback) {
   // 从本地快照获取当前项
   const item = localReviewList.value[currentIndex.value]
   if (!item) return
 
-  // 调用 store 提交复习（使用本地快照中的 key）
+  // 调用 store 提交复习（使用本地快照中的 key，传入 FSRS Rating）
   store.submitReview(item.key, feedback)
 
   // 显示成功动画
@@ -148,22 +156,22 @@ function handleRestart() {
             <div class="empty-subtitle">好好休息吧，明天再接再厉！</div>
           </div>
 
-          <!-- 打卡按钮 -->
+          <!-- 打卡按钮 - FSRS 标准 Rating -->
           <div class="action-buttons" v-if="!isAllDone && currentItem">
-            <button class="review-btn hard" @click="handleReview('hard')">
+            <button class="review-btn hard" @click="handleReview('again')">
               <span class="btn-icon">😓</span>
-              <span class="btn-text">困难</span>
-              <span class="btn-hint">较短间隔</span>
+              <span class="btn-text">忘记</span>
+              <span class="btn-hint">Again</span>
             </button>
-            <button class="review-btn normal" @click="handleReview('normal')">
+            <button class="review-btn normal" @click="handleReview('good')">
               <span class="btn-icon">😊</span>
-              <span class="btn-text">一般</span>
-              <span class="btn-hint">标准间隔</span>
+              <span class="btn-text">良好</span>
+              <span class="btn-hint">Good</span>
             </button>
             <button class="review-btn easy" @click="handleReview('easy')">
               <span class="btn-icon">😎</span>
               <span class="btn-text">简单</span>
-              <span class="btn-hint">较长间隔</span>
+              <span class="btn-hint">Easy</span>
             </button>
           </div>
 

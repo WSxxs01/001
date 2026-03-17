@@ -79,7 +79,7 @@ function getChapterProgress(chapter, chapterIndex) {
 // 删除章节
 function deleteChapter(chapterIndex) {
   const chapter = store.currentBookChapters[chapterIndex]
-  if (confirm(`确定要删除章节「${chapter.name}」吗？该章节下的所有小节学习记录将被清除。`)) {
+  if (confirm(`确定要删除章节「${chapter.name}」吗？该章节下的所有知识模块记忆调度记录将被清除。`)) {
     store.deleteChapter(chapterIndex)
   }
 }
@@ -359,7 +359,7 @@ function getStatusBadge(status) {
   opacity: 1;
 }
 
-/* 小节列表 */
+/* 知识模块列表 */
 .section-list {
   display: none;
   border-top: 1px solid var(--border-faint);

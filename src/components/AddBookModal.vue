@@ -41,7 +41,7 @@ function handleSubmit() {
     const chapterName = parts[0].trim()
     const sectionsStr = parts[1] || ''
 
-    // 分割小节（支持逗号、顿号、中文逗号）
+    // 分割知识模块（支持逗号、顿号、中文逗号）
     const sections = sectionsStr
       .split(/[,，、]/)
       .map(s => s.trim())
@@ -91,15 +91,15 @@ defineExpose({
         </div>
 
         <div class="form-group">
-          <label>章节与小节</label>
+          <label>章节与知识模块</label>
           <div class="format-hint">
-            格式：章节名 | 小节1, 小节2, 小节3
+            格式：章节名 | 模块1, 模块2, 模块3
           </div>
           <textarea
             v-model="chaptersText"
             placeholder="第1章 绪论 | 1.1基本概念, 1.2数据结构, 1.3算法分析
 第2章 线性表 | 2.1线性表定义, 2.2顺序表示, 2.3链式表示
-每行一个章节，小节用逗号分隔"
+每行一个章节，模块用逗号分隔"
           ></textarea>
         </div>
 

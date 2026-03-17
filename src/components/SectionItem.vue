@@ -18,7 +18,7 @@ const emit = defineEmits(['reviewSubmitted'])
 const store = useStudyStore()
 const isFlashing = ref(false)
 
-// 计算小节状态
+// 计算知识模块状态
 const status = computed(() => {
   return store.getSectionStatus(props.sectionKey)
 })
@@ -88,11 +88,11 @@ function triggerFlash() {
   }, 600)
 }
 
-// 删除小节
+// 删除知识模块
 function handleDelete(e) {
   e.stopPropagation()
 
-  if (confirm('确定要删除这个小节及其复习进度吗？不可恢复（除非立即撤销）')) {
+  if (confirm('确定要删除这个知识模块及其记忆调度记录吗？不可恢复（除非立即撤销）')) {
     store.deleteSection(props.sectionKey)
     emit('reviewSubmitted')
   }
@@ -116,8 +116,8 @@ function handleDelete(e) {
 
       <button
         class="action-btn delete-btn"
-        title="删除小节"
-        aria-label="删除小节"
+        title="删除知识模块"
+        aria-label="删除知识模块"
         @click="handleDelete"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
