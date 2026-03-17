@@ -7,6 +7,85 @@ import { uploadData, downloadData, getSyncConfig, debounce } from '../utils/sync
 // 初始化 FSRS 调度器
 const fsrs = new FSRS({})
 
+/**
+ * 【数据清洗与迁移】将旧版艾宾浩斯数据迁移到 FSRS 格式
+ * @param {Object} studyData - 学习记录数据
+ * @returns {Object} 清洗后的数据
+ */
+function migrateLegacyData(studyData) {
+  if (!studyData || typeof studyData !== 'object') return {}
+
+  Object.entries(studyData).forEach(([key, item]) => {
+    if (!item) return
+
+    // 检测：已有学习记录但没有 fsrsCard（旧版数据）
+    if (item.learned && !item.fsrsCard) {
+      console.log(`[数据迁移] 检测到旧版数据，正在迁移: ${key}`)
+
+      // 创建 FSRS 空卡片外壳
+      const card = createEmptyCard()
+
+      // 继承旧版的 due date，防止复习计划丢失
+      if (item.due) {
+        card.due = new Date(item.due)
+      } else if (item.reviews && item.reviews.length > 0) {
+        // 从 reviews 数组中找到最近的未完成的 scheduledDate
+        const pendingReview = item.reviews.find(r => !r.completed)
+        if (pendingReview && pendingReview.scheduledDate) {
+          card.due = new Date(pendingReview.scheduledDate)
+        }
+      }
+
+      // 如果有学习日期，设为 last_review
+      if (item.learnDate) {
+        card.last_review = new Date(item.learnDate)
+      }
+
+      // 从旧数据继承一些合理的初始值
+      const reviewCount = item.reviews ? item.reviews.filter(r => r.completed).length : 0
+      card.reps = reviewCount
+      card.difficulty = 5.0 // 默认中等难度
+      card.stability = Math.max(0.5, reviewCount * 0.5) // 根据复习次数估算稳定性
+
+      // 构建 FSRS 兼容结构
+      item.fsrsCard = card
+
+      // 同步顶层字段（兼容层）
+      item.due = formatDate(card.due)
+      item.difficulty = card.difficulty
+      item.stability = card.stability
+      item.interval = card.scheduled_days || 0
+      item.repetitions = card.reps
+
+      console.log(`[数据迁移] 完成: ${key}, due: ${item.due}`)
+    }
+
+    // 处理已有 fsrsCard 的情况：确保 Date 对象是有效的
+    if (item.fsrsCard) {
+      if (item.fsrsCard.due) {
+        item.fsrsCard.due = item.fsrsCard.due instanceof Date
+          ? item.fsrsCard.due
+          : new Date(item.fsrsCard.due)
+      }
+      if (item.fsrsCard.last_review) {
+        item.fsrsCard.last_review = item.fsrsCard.last_review instanceof Date
+          ? item.fsrsCard.last_review
+          : new Date(item.fsrsCard.last_review)
+      }
+
+      // 确保顶层 due 字段与 fsrsCard.due 同步
+      if (item.fsrsCard.due) {
+        const dueStr = formatDate(item.fsrsCard.due)
+        if (item.due !== dueStr) {
+          item.due = dueStr
+        }
+      }
+    }
+  })
+
+  return studyData
+}
+
 // Rating 映射：将字符串反馈转为 FSRS Rating 枚举
 const ratingMap = {
   'again': Rating.Again,   // 忘记 -> Again
@@ -213,19 +292,13 @@ export const useStudyStore = defineStore('study', () => {
     // 读取学习记录
     const savedData = localStorage.getItem(STORAGE_KEY)
     if (savedData) {
-      studyData.value = JSON.parse(savedData)
+      const parsedData = JSON.parse(savedData)
 
-      // 【关键】修复 FSRS Date 反序列化：将字符串转回 Date 对象
-      Object.values(studyData.value).forEach(data => {
-        if (data && data.fsrsCard) {
-          if (data.fsrsCard.due && typeof data.fsrsCard.due === 'string') {
-            data.fsrsCard.due = new Date(data.fsrsCard.due)
-          }
-          if (data.fsrsCard.last_review && typeof data.fsrsCard.last_review === 'string') {
-            data.fsrsCard.last_review = new Date(data.fsrsCard.last_review)
-          }
-        }
-      })
+      // 【关键】数据清洗与迁移：处理旧版数据 + 修复 Date 反序列化
+      studyData.value = migrateLegacyData(parsedData)
+
+      // 如果迁移后有修改，立即保存回本地存储
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
     } else {
       studyData.value = {}
     }
@@ -592,21 +665,11 @@ export const useStudyStore = defineStore('study', () => {
       }
 
       if (data.studyData) {
-        studyData.value = data.studyData
+        // 【关键】导入时执行数据清洗与迁移
+        const migratedData = migrateLegacyData(data.studyData)
+        studyData.value = migratedData
 
-        // 【关键】导入时修复 FSRS Date 反序列化
-        Object.values(studyData.value).forEach(item => {
-          if (item && item.fsrsCard) {
-            if (item.fsrsCard.due && typeof item.fsrsCard.due === 'string') {
-              item.fsrsCard.due = new Date(item.fsrsCard.due)
-            }
-            if (item.fsrsCard.last_review && typeof item.fsrsCard.last_review === 'string') {
-              item.fsrsCard.last_review = new Date(item.fsrsCard.last_review)
-            }
-          }
-        })
-
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.studyData))
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
       }
 
       // 重置当前选中的书籍
