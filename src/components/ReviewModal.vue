@@ -14,8 +14,13 @@ const emit = defineEmits(['close', 'reviewComplete'])
 const store = useStudyStore()
 const modalVisible = ref(false)
 
+// 本地复习列表快照（修复响应式跳项问题）
+const localReviewList = ref([])
+
 // 打开弹窗
 function openModal() {
+  // 深拷贝当时的复习队列，避免打卡后 store.dueQueue 变化导致跳项
+  localReviewList.value = [...store.dueQueue]
   currentIndex.value = 0
   feedbackStatus.value = null
   modalVisible.value = true
@@ -38,28 +43,30 @@ const currentIndex = ref(0)
 // 复习反馈状态
 const feedbackStatus = ref(null) // 'success' | null
 
-// 当前复习项
+// 当前复习项（从本地快照获取）
 const currentItem = computed(() => {
-  return store.dueQueue[currentIndex.value] || null
+  return localReviewList.value[currentIndex.value] || null
 })
 
-// 是否全部完成
+// 是否全部完成（基于本地快照）
 const isAllDone = computed(() => {
-  return store.dueQueue.length > 0 && currentIndex.value >= store.dueQueue.length
+  return localReviewList.value.length > 0 && currentIndex.value >= localReviewList.value.length
 })
 
-// 进度文本
+// 进度文本（基于本地快照）
 const progressText = computed(() => {
-  if (store.dueQueue.length === 0) return '0 / 0'
-  return `${currentIndex.value + 1} / ${store.dueQueue.length}`
+  if (localReviewList.value.length === 0) return '0 / 0'
+  return `${currentIndex.value + 1} / ${localReviewList.value.length}`
 })
 
 // 处理打卡
 function handleReview(feedback) {
-  if (!currentItem.value) return
+  // 从本地快照获取当前项
+  const item = localReviewList.value[currentIndex.value]
+  if (!item) return
 
-  // 调用 store 提交复习
-  store.submitReview(currentItem.value.key, feedback)
+  // 调用 store 提交复习（使用本地快照中的 key）
+  store.submitReview(item.key, feedback)
 
   // 显示成功动画
   feedbackStatus.value = 'success'
@@ -86,6 +93,8 @@ function handleClose() {
 
 // 重新开始
 function handleRestart() {
+  // 重新获取当前队列的快照
+  localReviewList.value = [...store.dueQueue]
   currentIndex.value = 0
 }
 </script>
@@ -104,7 +113,7 @@ function handleRestart() {
             <div class="progress-bar">
               <div
                 class="progress-fill"
-                :style="{ width: store.dueQueue.length ? (currentIndex / store.dueQueue.length * 100) + '%' : '0%' }"
+                :style="{ width: localReviewList.length ? (currentIndex / localReviewList.length * 100) + '%' : '0%' }"
               ></div>
             </div>
             <div class="progress-text">
@@ -128,12 +137,12 @@ function handleRestart() {
           <div class="complete-content" v-else-if="isAllDone">
             <div class="celebration-icon">🎉</div>
             <div class="celebration-title">恭喜！今日复习任务全部完成！</div>
-            <div class="celebration-subtitle">太棒了，你已完成 {{ store.dueQueue.length }} 个复习任务</div>
+            <div class="celebration-subtitle">太棒了，你已完成 {{ localReviewList.length }} 个复习任务</div>
             <button class="restart-btn" @click="handleRestart">再复习一遍</button>
           </div>
 
           <!-- 空队列提示 -->
-          <div class="empty-content" v-else-if="store.dueQueue.length === 0">
+          <div class="empty-content" v-else-if="localReviewList.length === 0">
             <div class="empty-icon">☕</div>
             <div class="empty-title">今日复习已清空</div>
             <div class="empty-subtitle">好好休息吧，明天再接再厉！</div>
@@ -164,7 +173,7 @@ function handleRestart() {
           </div>
 
           <!-- 空队列时显示返回按钮 -->
-          <div class="complete-actions" v-if="store.dueQueue.length === 0">
+          <div class="complete-actions" v-if="localReviewList.length === 0">
             <button class="done-btn" @click="handleClose">返回主页</button>
           </div>
         </div>
