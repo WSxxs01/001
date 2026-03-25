@@ -816,6 +816,66 @@ export const useStudyStore = defineStore('study', () => {
     }
   }
 
+  // ==================== 搁置到明天（逃生机制）====================
+  /**
+   * 【搁置到明天】将当前复习节点推迟到明天同一时间
+   * 不改变 FSRS 的 stability 和 difficulty，纯粹物理延后
+   * @param {string} sectionKey - 知识模块 key (bookId_chapterIdx_sectionIdx)
+   * @returns {boolean} 是否成功
+   */
+  function buryUntilTomorrow(sectionKey) {
+    try {
+      const data = studyData.value[sectionKey]
+      if (!data || !data.learned || !data.fsrsCard) {
+        console.error('[buryUntilTomorrow] 无效的学习数据')
+        return false
+      }
+
+      // 【关键】保存历史状态（用于撤销）- 深拷贝
+      const historyData = JSON.parse(JSON.stringify(data))
+      // 恢复 Date 对象（JSON 序列化会转成字符串）
+      if (historyData.fsrsCard?.due) {
+        historyData.fsrsCard.due = new Date(historyData.fsrsCard.due)
+      }
+      if (historyData.fsrsCard?.last_review) {
+        historyData.fsrsCard.last_review = new Date(historyData.fsrsCard.last_review)
+      }
+      pushHistory(sectionKey, historyData)
+
+      // 计算明天同一时间
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      // 保持原来的时间（小时:分钟）
+      const originalDue = data.fsrsCard.due instanceof Date
+        ? data.fsrsCard.due
+        : new Date(data.fsrsCard.due)
+      tomorrow.setHours(
+        originalDue.getHours(),
+        originalDue.getMinutes(),
+        originalDue.getSeconds(),
+        originalDue.getMilliseconds()
+      )
+
+      // 更新 due 时间（不改变 stability 和 difficulty）
+      data.fsrsCard.due = tomorrow
+      data.due = formatDate(tomorrow)
+
+      // 保存到本地存储
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
+
+      console.log('[buryUntilTomorrow] 已搁置到明天:', {
+        sectionKey,
+        newDue: data.due,
+        newDueTime: tomorrow.toISOString()
+      })
+
+      return true
+    } catch (error) {
+      console.error('[buryUntilTomorrow] 搁置失败:', error)
+      return false
+    }
+  }
+
   // 撤销上一步操作
   function undoLastAction() {
     if (historyStack.value.length === 0) {
@@ -1028,6 +1088,7 @@ export const useStudyStore = defineStore('study', () => {
     getSectionStatus,
     importData,
     exportData,
-    undoLastAction
+    undoLastAction,
+    buryUntilTomorrow
   }
 })

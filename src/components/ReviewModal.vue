@@ -105,6 +105,48 @@ function handleRestart() {
   localReviewList.value = [...store.dueQueue]
   currentIndex.value = 0
 }
+
+// ==================== 逃生舱机制 ====================
+
+/**
+ * 【稍后再看】将当前卡片移到队列末尾
+ * 注意：由于数组移位，不要执行 currentIndex.value++
+ */
+function skipToBottom() {
+  const item = localReviewList.value[currentIndex.value]
+  if (!item) return
+
+  // 从当前位置移除
+  localReviewList.value.splice(currentIndex.value, 1)
+  // 推入数组末尾
+  localReviewList.value.push(item)
+
+  console.log('[skipToBottom] 卡片已移到队列末尾:', item.sectionName)
+}
+
+/**
+ * 【搁置到明天】调用 Store 方法推迟到明天
+ * 然后进入下一张卡片
+ */
+function buryCard() {
+  const item = localReviewList.value[currentIndex.value]
+  if (!item) return
+
+  // 调用 Store 方法推迟复习时间
+  const success = store.buryUntilTomorrow(item.key)
+
+  if (success) {
+    // 从本地队列中移除（因为已经推迟到明天，不再属于今日队列）
+    localReviewList.value.splice(currentIndex.value, 1)
+
+    console.log('[buryCard] 卡片已搁置到明天:', item.sectionName)
+
+    // 检查是否全部完成
+    if (isAllDone.value) {
+      emit('reviewComplete')
+    }
+  }
+}
 </script>
 
 <template>
@@ -172,6 +214,18 @@ function handleRestart() {
               <span class="btn-icon">😎</span>
               <span class="btn-text">简单</span>
               <span class="btn-hint">Easy</span>
+            </button>
+          </div>
+
+          <!-- 逃生舱控制区 - 幽灵按钮 -->
+          <div class="escape-hatch" v-if="!isAllDone && currentItem">
+            <button class="ghost-btn skip-btn" @click="skipToBottom">
+              <span class="ghost-icon">⏭️</span>
+              <span class="ghost-text">稍后再看</span>
+            </button>
+            <button class="ghost-btn bury-btn" @click="buryCard">
+              <span class="ghost-icon">📅</span>
+              <span class="ghost-text">搁置到明天</span>
             </button>
           </div>
 
@@ -437,6 +491,92 @@ function handleRestart() {
   color: var(--text-muted);
 }
 
+/* ==================== 逃生舱 - 幽灵按钮 ==================== */
+.escape-hatch {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border-faint);
+}
+
+.ghost-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.ghost-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(94, 106, 210, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.4s ease;
+}
+
+.ghost-btn:hover::before {
+  width: 150%;
+  height: 150%;
+}
+
+.ghost-btn:hover {
+  border-color: rgba(94, 106, 210, 0.4);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(94, 106, 210, 0.08);
+  box-shadow: 0 0 20px rgba(94, 106, 210, 0.15);
+}
+
+.ghost-btn:active {
+  transform: scale(0.96);
+}
+
+.ghost-icon {
+  font-size: 14px;
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+}
+
+.ghost-btn:hover .ghost-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.ghost-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* 跳过按钮 - 偏冷色调 */
+.ghost-btn.skip-btn:hover {
+  border-color: rgba(94, 156, 230, 0.4);
+  background: rgba(94, 156, 230, 0.08);
+  box-shadow: 0 0 20px rgba(94, 156, 230, 0.15);
+}
+
+/* 搁置按钮 - 偏暖色调 */
+.ghost-btn.bury-btn:hover {
+  border-color: rgba(251, 146, 60, 0.4);
+  background: rgba(251, 146, 60, 0.08);
+  box-shadow: 0 0 20px rgba(251, 146, 60, 0.15);
+}
+
 /* 完成画面 */
 .complete-content {
   flex: 1;
@@ -596,6 +736,15 @@ function handleRestart() {
 
   .btn-hint {
     display: none;
+  }
+
+  .escape-hatch {
+    gap: 8px;
+  }
+
+  .ghost-btn {
+    padding: 8px 14px;
+    font-size: 12px;
   }
 }
 </style>
