@@ -4,6 +4,7 @@ import { useStudyStore } from './stores/useStudyStore'
 import BookTabs from './components/BookTabs.vue'
 import ChapterList from './components/ChapterList.vue'
 import StatisticsCharts from './components/StatisticsCharts.vue'
+import FutureSchedule from './components/FutureSchedule.vue'
 import ContributionHeatmap from './components/ContributionHeatmap.vue'
 import AddBookModal from './components/AddBookModal.vue'
 import DataManagement from './components/DataManagement.vue'
@@ -159,6 +160,9 @@ function openAddBookModal() {
 
     <!-- 图表区域 -->
     <StatisticsCharts />
+
+    <!-- 未来预测时间轴 -->
+    <FutureSchedule />
 
     <!-- 学习热力图 -->
     <ContributionHeatmap />

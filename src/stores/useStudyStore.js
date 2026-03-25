@@ -322,6 +322,114 @@ export const useStudyStore = defineStore('study', () => {
     return count
   })
 
+  // ==================== 未来预测时间轴 Getter ====================
+  /**
+   * 【未来预测时间轴】预测未来几天（明天、后天及以后）的待复习清单
+   * 基于 FSRS 算法的 due 时间戳进行分组和排序
+   */
+  const futureSchedule = computed(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    // 今天的结束时间（23:59:59.999）
+    const todayEnd = new Date(today)
+    todayEnd.setHours(23, 59, 59, 999)
+
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    // 收集所有未来的复习任务
+    const futureItems = []
+
+    Object.entries(studyData.value).forEach(([key, data]) => {
+      if (!data || !data.learned || !data.fsrsCard) return
+
+      const dueDate = data.fsrsCard.due instanceof Date
+        ? data.fsrsCard.due
+        : new Date(data.fsrsCard.due)
+
+      // 只取今天之后到期的项目
+      if (dueDate > todayEnd) {
+        // 获取上下文信息
+        const [bookId, chapterIdx, sectionIdx] = key.split('_')
+        const book = books.value[bookId]
+        const chapter = book?.chapters[parseInt(chapterIdx)]
+        const sectionName = chapter?.sections[parseInt(sectionIdx)]
+
+        // 计算与今天的天数差（自然日）
+        const diffTime = dueDate.getTime() - today.getTime()
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+        // 格式化时间（小时:分钟）
+        const hours = String(dueDate.getHours()).padStart(2, '0')
+        const minutes = String(dueDate.getMinutes()).padStart(2, '0')
+        const timeStr = `${hours}:${minutes}`
+
+        // 格式化日期（MM-DD）
+        const month = String(dueDate.getMonth() + 1).padStart(2, '0')
+        const day = String(dueDate.getDate()).padStart(2, '0')
+        const dateStr = `${month}-${day}`
+
+        futureItems.push({
+          key,
+          bookId,
+          bookName: book?.name || '未知书籍',
+          chapterName: chapter?.name || '未知章节',
+          sectionName: sectionName || '未知小节',
+          dueDate,
+          diffDays,
+          dateStr,
+          time: timeStr,
+          fullDate: formatDate(dueDate)
+        })
+      }
+    })
+
+    // 按日期分组
+    const grouped = new Map()
+
+    futureItems.forEach(item => {
+      const groupKey = item.fullDate
+      if (!grouped.has(groupKey)) {
+        // 确定标签
+        let label
+        if (item.diffDays === 1) {
+          label = '明天'
+        } else if (item.diffDays === 2) {
+          label = '后天'
+        } else {
+          label = `${item.diffDays}天后`
+        }
+
+        grouped.set(groupKey, {
+          label,
+          dateStr: item.dateStr,
+          fullDate: groupKey,
+          diffDays: item.diffDays,
+          items: []
+        })
+      }
+      grouped.get(groupKey).items.push(item)
+    })
+
+    // 转换为数组并按日期排序
+    const result = Array.from(grouped.values())
+      .sort((a, b) => a.diffDays - b.diffDays)
+
+    // 每天内部按时间排序
+    result.forEach(group => {
+      group.items.sort((a, b) => {
+        // 先按时间排序
+        const timeCompare = a.time.localeCompare(b.time)
+        if (timeCompare !== 0) return timeCompare
+        // 时间相同则按书籍名称排序
+        return a.bookName.localeCompare(b.bookName)
+      })
+    })
+
+    return result
+  })
+
   // 当前书籍的章节列表
   const currentBookChapters = computed(() => {
     if (!currentBookId.value || !books.value[currentBookId.value]) return []
@@ -901,6 +1009,7 @@ export const useStudyStore = defineStore('study', () => {
     currentBookChapters,
     dueQueue,
     reviewQueue,
+    futureSchedule,
 
     // 是否可以撤销
     canUndo: computed(() => historyStack.value.length > 0),
