@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Rating } from 'ts-fsrs'
 import { useStudyStore } from '../stores/useStudyStore'
 
@@ -17,6 +17,15 @@ const modalVisible = ref(false)
 
 // 本地复习列表快照（修复响应式跳项问题）
 const localReviewList = ref([])
+
+// 【关键】监听 dueQueue 变化，导入数据后自动刷新
+// 只在弹窗打开且刚开始复习时刷新，避免打乱已有进度
+watch(() => store.dueQueue, (newQueue) => {
+  if (modalVisible.value && currentIndex.value === 0) {
+    console.log('[ReviewModal] dueQueue 变化，刷新列表:', newQueue.length, '项')
+    localReviewList.value = [...newQueue]
+  }
+}, { deep: true })
 
 // 打开弹窗
 function openModal() {

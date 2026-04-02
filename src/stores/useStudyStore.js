@@ -63,14 +63,27 @@ function sanitizeFSRSCard(item) {
   // due 字段强制转换
   if (!card.due || !(card.due instanceof Date) || isNaN(card.due.getTime())) {
     const oldDueStr = card.due
-    card.due = new Date(card.due || new Date())
-    if (isNaN(card.due.getTime())) {
-      // 如果转换失败，设置为明天
-      const tomorrow = new Date()
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      card.due = tomorrow
+    // 尝试解析原始日期字符串
+    const parsedDue = new Date(oldDueStr)
+
+    if (!isNaN(parsedDue.getTime())) {
+      // 解析成功，使用解析后的日期
+      card.due = parsedDue
+      console.log('[sanitizeFSRSCard] due 字段已解析:', oldDueStr, '->', card.due)
+    } else {
+      // 解析失败，尝试从 item.due 恢复
+      const itemDueDate = item.due ? new Date(item.due) : null
+      if (itemDueDate && !isNaN(itemDueDate.getTime())) {
+        card.due = itemDueDate
+        console.log('[sanitizeFSRSCard] due 字段从 item.due 恢复:', item.due, '->', card.due)
+      } else {
+        // 最后手段：设置为明天（但保留原始值用于调试）
+        const tomorrow = new Date()
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        card.due = tomorrow
+        console.warn('[sanitizeFSRSCard] due 字段解析失败，设为明天:', oldDueStr, '->', card.due)
+      }
     }
-    console.log('[sanitizeFSRSCard] due 字段已修复:', oldDueStr, '->', card.due)
   }
 
   // last_review 字段修复
