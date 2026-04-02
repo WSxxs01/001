@@ -69,26 +69,11 @@ const ratingMap = {
 
 // 处理打卡
 function handleReview(feedback) {
-  // 从本地快照获取当前项
   const item = localReviewList.value[currentIndex.value]
   if (!item) return
 
-  // 调用 store 提交复习（使用本地快照中的 key，传入 FSRS Rating）
   store.submitReview(item.key, feedback)
-
-  // 显示成功动画
-  feedbackStatus.value = 'success'
-
-  // 延迟后切换到下一个
-  setTimeout(() => {
-    feedbackStatus.value = null
-    currentIndex.value++
-
-    // 如果全部完成，通知父组件
-    if (isAllDone.value) {
-      emit('reviewComplete')
-    }
-  }, 600)
+  advanceToNext()
 }
 
 // 关闭弹窗
@@ -106,6 +91,25 @@ function handleRestart() {
   currentIndex.value = 0
 }
 
+// ==================== 工具函数 ====================
+
+/**
+ * 【前进到下一张】处理成功反馈和页面切换
+ * 复用于 handleReview 和 backdateReview
+ */
+function advanceToNext() {
+  feedbackStatus.value = 'success'
+
+  setTimeout(() => {
+    feedbackStatus.value = null
+    currentIndex.value++
+
+    if (isAllDone.value) {
+      emit('reviewComplete')
+    }
+  }, 600)
+}
+
 // ==================== 逃生舱机制 ====================
 
 /**
@@ -116,10 +120,9 @@ function skipToBottom() {
   const item = localReviewList.value[currentIndex.value]
   if (!item) return
 
-  // 从当前位置移除
-  localReviewList.value.splice(currentIndex.value, 1)
-  // 推入数组末尾
-  localReviewList.value.push(item)
+  // 从当前位置移除并推入末尾
+  const [removed] = localReviewList.value.splice(currentIndex.value, 1)
+  localReviewList.value.push(removed)
 
   console.log('[skipToBottom] 卡片已移到队列末尾:', item.sectionName)
 }
@@ -147,6 +150,29 @@ function buryCard() {
     }
   }
 }
+
+/**
+ * 【补打卡（昨天）】适用于昨天实际复习了但忘记打卡的情况
+ * 使用昨天的时间作为复习时间，让 FSRS 正确计算下次复习
+ */
+function backdateReview() {
+  const item = localReviewList.value[currentIndex.value]
+  if (!item) return
+
+  // 计算昨天同一时间
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+
+  console.log('[backdateReview] 补打卡:', item.sectionName, yesterday.toISOString())
+
+  store.submitReview(item.key, 'good', yesterday)
+  advanceToNext()
+}
+
+// 判断当前卡片是否逾期（用于显示补打卡按钮）
+const isCurrentItemOverdue = computed(() => {
+  return currentItem.value?.status === 'overdue'
+})
 </script>
 
 <template>
@@ -180,6 +206,14 @@ function buryCard() {
             </div>
             <div class="due-info" :class="currentItem.status">
               {{ currentItem.status === 'overdue' ? '⚠️ 已逾期' : '📅 今日复习' }}
+            </div>
+            <!-- 逾期提示与补打卡 -->
+            <div v-if="isCurrentItemOverdue" class="backdate-hint">
+              <span class="hint-text">昨天学过但忘记打卡？</span>
+              <button class="backdate-btn" @click="backdateReview">
+                <span>📅</span>
+                <span>补打卡（昨天）</span>
+              </button>
             </div>
           </div>
 
@@ -395,6 +429,62 @@ function buryCard() {
   background: var(--warning-subtle);
   color: var(--warning);
   border: 1px solid rgba(226, 179, 64, 0.3);
+}
+
+/* 补打卡区域 */
+.backdate-hint {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: rgba(94, 106, 210, 0.08);
+  border: 1px dashed rgba(94, 106, 210, 0.3);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hint-text {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.backdate-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(94, 106, 210, 0.15);
+  border: 1px solid rgba(94, 106, 210, 0.4);
+  border-radius: var(--radius-md);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.backdate-btn:hover {
+  background: rgba(94, 106, 210, 0.25);
+  border-color: rgba(94, 106, 210, 0.6);
+  box-shadow: 0 0 20px rgba(94, 106, 210, 0.2);
+  transform: translateY(-1px);
+}
+
+.backdate-btn:active {
+  transform: scale(0.98);
 }
 
 /* 打卡按钮 */
@@ -744,6 +834,20 @@ function buryCard() {
 
   .ghost-btn {
     padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .backdate-hint {
+    padding: 12px 16px;
+    margin-top: 16px;
+  }
+
+  .hint-text {
+    font-size: 12px;
+  }
+
+  .backdate-btn {
+    padding: 6px 12px;
     font-size: 12px;
   }
 }

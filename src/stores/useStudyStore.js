@@ -521,16 +521,7 @@ export const useStudyStore = defineStore('study', () => {
       const migratedData = migrateLegacyData(parsedData)
 
       // 【终极关键】强制深度净化所有 FSRS 卡片
-      // 遍历所有 item，无论是否 learned，都确保有完整的 fsrsCard
-      Object.entries(migratedData).forEach(([key, item]) => {
-        if (item) {
-          console.log(`[initStore] 净化 item: ${key}`, {
-            hasFsrsCard: !!item.fsrsCard,
-            hasStability: item.fsrsCard ? typeof item.fsrsCard.stability !== 'undefined' : false
-          })
-          sanitizeFSRSCard(item)
-        }
-      })
+      sanitizeAllItems(migratedData)
 
       // 使用展开运算符创建新对象，确保 Vue 响应式
       studyData.value = { ...migratedData }
@@ -711,8 +702,34 @@ export const useStudyStore = defineStore('study', () => {
     return data
   }
 
+  /**
+   * 【工具】从 JSON 反序列化后恢复 Date 对象
+   */
+  function restoreDates(obj) {
+    if (obj.fsrsCard?.due) {
+      obj.fsrsCard.due = new Date(obj.fsrsCard.due)
+    }
+    if (obj.fsrsCard?.last_review) {
+      obj.fsrsCard.last_review = new Date(obj.fsrsCard.last_review)
+    }
+  }
+
+  /**
+   * 【工具】批量净化所有学习数据
+   * 用于 initStore 和 importData
+   */
+  function sanitizeAllItems(data) {
+    Object.entries(data).forEach(([key, item]) => {
+      if (item) {
+        sanitizeFSRSCard(item)
+      }
+    })
+    return data
+  }
+
   // 提交复习反馈 (使用原生 ts-fsrs)
-  function submitReview(sectionKey, feedback) {
+  // reviewDate: 可选，用于补打卡（回溯复习），传入昨天的日期
+  function submitReview(sectionKey, feedback, reviewDate = null) {
     try {
       const data = studyData.value[sectionKey]
 
@@ -721,22 +738,17 @@ export const useStudyStore = defineStore('study', () => {
         return startLearning(sectionKey)
       }
 
-      // 【关键】保存历史状态（用于撤销）- 深拷贝 fsrsCard
+      // 【关键】保存历史状态（用于撤销）- 深拷贝并恢复 Date 对象
       const historyData = JSON.parse(JSON.stringify(data))
-      // 恢复 Date 对象（JSON 序列化会转成字符串）
-      if (historyData.fsrsCard?.due) {
-        historyData.fsrsCard.due = new Date(historyData.fsrsCard.due)
-      }
-      if (historyData.fsrsCard?.last_review) {
-        historyData.fsrsCard.last_review = new Date(historyData.fsrsCard.last_review)
-      }
+      restoreDates(historyData)
       pushHistory(sectionKey, historyData)
 
       // 【关键】强制净化 FSRS 卡片数据（防止 JSON 序列化导致 Date 变字符串）
       sanitizeFSRSCard(data)
 
       // 使用 ts-fsrs 进行调度
-      const now = new Date()
+      // 支持补打卡：如果传入 reviewDate 则使用，否则使用当前时间
+      const reviewTime = reviewDate instanceof Date ? reviewDate : new Date()
       const card = data.fsrsCard
 
       console.log('[submitReview] 卡片数据:', {
@@ -745,7 +757,9 @@ export const useStudyStore = defineStore('study', () => {
         dueType: card?.due ? typeof card.due : 'none',
         dueIsDate: card?.due instanceof Date,
         stability: card?.stability,
-        difficulty: card?.difficulty
+        difficulty: card?.difficulty,
+        reviewDate: reviewDate ? reviewDate.toISOString() : 'now',
+        isBackdate: !!reviewDate
       })
 
       // 确保 card 是有效的
@@ -762,7 +776,7 @@ export const useStudyStore = defineStore('study', () => {
       }
 
       // 调用 FSRS 算法
-      const scheduling = fsrs.repeat(card, now)
+      const scheduling = fsrs.repeat(card, reviewTime)
 
       // 获取对应评级的结果
       const rating = ratingMap[feedback] || Rating.Good
@@ -785,7 +799,10 @@ export const useStudyStore = defineStore('study', () => {
         interval: nextCard.scheduled_days || 0,
         repetitions: nextCard.reps || 0,
         // 保存当前评级
-        rating: feedback
+        rating: feedback,
+        // 标记是否为补打卡
+        isBackdated: !!reviewDate,
+        actualReviewDate: reviewDate ? formatDate(reviewDate) : formatDate(new Date())
       }
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
@@ -831,30 +848,17 @@ export const useStudyStore = defineStore('study', () => {
         return false
       }
 
-      // 【关键】保存历史状态（用于撤销）- 深拷贝
+      // 【关键】保存历史状态（用于撤销）
       const historyData = JSON.parse(JSON.stringify(data))
-      // 恢复 Date 对象（JSON 序列化会转成字符串）
-      if (historyData.fsrsCard?.due) {
-        historyData.fsrsCard.due = new Date(historyData.fsrsCard.due)
-      }
-      if (historyData.fsrsCard?.last_review) {
-        historyData.fsrsCard.last_review = new Date(historyData.fsrsCard.last_review)
-      }
+      restoreDates(historyData)
       pushHistory(sectionKey, historyData)
 
-      // 计算明天同一时间
-      const tomorrow = new Date()
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      // 保持原来的时间（小时:分钟）
+      // 计算明天同一时间（保持原小时:分钟）
       const originalDue = data.fsrsCard.due instanceof Date
         ? data.fsrsCard.due
         : new Date(data.fsrsCard.due)
-      tomorrow.setHours(
-        originalDue.getHours(),
-        originalDue.getMinutes(),
-        originalDue.getSeconds(),
-        originalDue.getMilliseconds()
-      )
+      const tomorrow = new Date(originalDue)
+      tomorrow.setDate(tomorrow.getDate() + 1)
 
       // 更新 due 时间（不改变 stability 和 difficulty）
       data.fsrsCard.due = tomorrow
@@ -887,15 +891,8 @@ export const useStudyStore = defineStore('study', () => {
       // 恢复历史状态
       const restoredData = lastAction.data
 
-      // 【关键】恢复 Date 对象（JSON 序列化会转成字符串）
-      if (restoredData.fsrsCard) {
-        if (restoredData.fsrsCard.due && typeof restoredData.fsrsCard.due === 'string') {
-          restoredData.fsrsCard.due = new Date(restoredData.fsrsCard.due)
-        }
-        if (restoredData.fsrsCard.last_review && typeof restoredData.fsrsCard.last_review === 'string') {
-          restoredData.fsrsCard.last_review = new Date(restoredData.fsrsCard.last_review)
-        }
-      }
+      // 【关键】恢复 Date 对象
+      restoreDates(restoredData)
 
       studyData.value[lastAction.key] = restoredData
       localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
@@ -990,18 +987,9 @@ export const useStudyStore = defineStore('study', () => {
         const migratedData = migrateLegacyData(data.studyData)
 
         // 【终极关键】强制深度净化所有 FSRS 卡片
-        // 遍历所有 item，无论是否 learned，都确保有完整的 fsrsCard
-        Object.entries(migratedData).forEach(([key, item]) => {
-          if (item) {
-            console.log(`[importData] 净化 item: ${key}`, {
-              hasFsrsCard: !!item.fsrsCard,
-              hasStability: item.fsrsCard ? typeof item.fsrsCard.stability !== 'undefined' : false
-            })
-            sanitizeFSRSCard(item)
-          }
-        })
+        sanitizeAllItems(migratedData)
 
-        // 直接修改对象后赋值，确保 Vue 响应式能检测到变化
+        // 使用展开运算符确保 Vue 响应式
         studyData.value = { ...migratedData }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(studyData.value))
 
